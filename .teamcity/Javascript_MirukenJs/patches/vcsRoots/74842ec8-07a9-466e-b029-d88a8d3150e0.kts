@@ -14,5 +14,8 @@ create("8afe80d3-49b6-4e67-8c8e-126b73c04bd6", GitVcsRoot({
     id = "Javascript_MirukenJs_Core_CoreGitCi"
     name = "core.git_CI"
     url = "git@github.com:Miruken-JS/core.git"
+    authMethod = uploadedKey {
+        uploadedKey = "provenstyle"
+    }
 }))
 
