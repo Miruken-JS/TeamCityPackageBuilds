@@ -15,6 +15,11 @@ create("8afe80d3-49b6-4e67-8c8e-126b73c04bd6", BuildType({
     id = "Javascript_MirukenJs_Core_CiBuild"
     name = "CI Build"
 
+    vcs {
+        root("Javascript_MirukenJs_Core_CoreGitCi")
+
+    }
+
     steps {
         script {
             name = "Yarn Install"
