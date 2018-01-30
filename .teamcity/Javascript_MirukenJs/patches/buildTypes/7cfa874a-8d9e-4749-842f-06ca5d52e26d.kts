@@ -20,6 +20,10 @@ create("8afe80d3-49b6-4e67-8c8e-126b73c04bd6", BuildType({
             name = "Yarn Install"
             scriptContent = "%yarn% install"
         }
+        script {
+            name = "JSPM Install"
+            scriptContent = "%JSPM% Install"
+        }
     }
 }))
 
