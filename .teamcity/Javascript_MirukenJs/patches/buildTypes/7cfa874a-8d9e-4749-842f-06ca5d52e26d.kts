@@ -31,7 +31,7 @@ create("8afe80d3-49b6-4e67-8c8e-126b73c04bd6", BuildType({
         }
         script {
             name = "Test"
-            scriptContent = "%gulp${'$'} test"
+            scriptContent = "%gulp% test"
         }
         script {
             name = "Build"
