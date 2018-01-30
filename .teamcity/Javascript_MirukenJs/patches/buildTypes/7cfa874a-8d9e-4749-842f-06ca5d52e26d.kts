@@ -24,6 +24,10 @@ create("8afe80d3-49b6-4e67-8c8e-126b73c04bd6", BuildType({
             name = "JSPM Install"
             scriptContent = "%jspm% install"
         }
+        script {
+            name = "Test"
+            scriptContent = "%gulp${'$'} test"
+        }
     }
 }))
 
