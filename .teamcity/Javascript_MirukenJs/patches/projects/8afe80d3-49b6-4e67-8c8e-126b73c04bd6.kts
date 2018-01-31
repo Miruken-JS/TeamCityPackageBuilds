@@ -13,6 +13,6 @@ create("9e077ab3-491d-42b9-9210-84dd56e29fc8", Project({
     uuid = "8afe80d3-49b6-4e67-8c8e-126b73c04bd6"
     id = "Javascript_MirukenJs_Core"
     parentId = "Javascript_MirukenJs"
-    name = "Core"
+    name = "Core Manual"
 }))
 
