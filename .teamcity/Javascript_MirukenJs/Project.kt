@@ -31,7 +31,7 @@ object Project : Project({
     subProject(configureJavascriptProject(JavascriptProject(
             guid              = "983f8966-9172-49d6-89b2-4ca5acbe22f8",
             parentId          = "Javascript_MirukenJs",
-            id                = "Javascript_MirukenJs_Core",
+            id                = "Javascript_MirukenJs_Core2",
             name              = "Core Project",
             codeGithubUrl     = "git@github.com:Miruken-JS/core.git",
             npmApiKey         = "%MirukenNugetApiKey%",
