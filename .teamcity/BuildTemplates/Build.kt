@@ -9,6 +9,7 @@ import jetbrains.buildServer.configs.kotlin.v2017_2.*
 import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.finishBuildTrigger
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.PowerShellStep
+import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.script
 
 
 class JavascriptProject(
@@ -93,16 +94,38 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
 
     fun yarnInstall(buildType: BuildType) : BuildType{
         buildType.steps {
+            script {
+                name          = "Yarn Install"
+                scriptContent = "%yarn% install"
+            }
         }
         return buildType
     }
     fun jspmInstall(buildType: BuildType) : BuildType{
         buildType.steps {
+            script {
+                name          = "JSPM Install"
+                scriptContent = "%jspm% install"
+            }
         }
         return buildType
     }
     fun test(buildType: BuildType) : BuildType{
         buildType.steps {
+            script {
+                name          = "Test"
+                scriptContent = "%gulp% test"
+            }
+        }
+        return buildType
+    }
+
+    fun build(buildType: BuildType) : BuildType{
+        buildType.steps {
+            script {
+                name          = "Build"
+                scriptContent = "%gulp% build"
+            }
         }
         return buildType
     }
@@ -187,7 +210,7 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
     }
 
     fun javascriptBuild(buildType: BuildType) : BuildType{
-        test(jspmInstall(yarnInstall(buildType)))
+        build(test(jspmInstall(yarnInstall(buildType))))
 
         buildType.buildNumberPattern = "%BuildFormatSpecification%"
 
