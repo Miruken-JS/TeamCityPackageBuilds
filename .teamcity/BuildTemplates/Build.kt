@@ -322,9 +322,11 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
         params {
             param("ArtifactsIn", """
             package.json => Build.zip!
+            dist         => Build.zip!/dist
         """.trimIndent())
             param("ArtifactsOut", """
             Build.zip!/package.json
+            Build.zip!/dist => dist
         """.trimIndent())
             param("MajorVersion",        solution.majorVersion)
             param("MinorVersion",        solution.minorVersion)
