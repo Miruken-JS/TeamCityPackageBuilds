@@ -1,8 +1,9 @@
 package Javascript_MirukenJs
 
-import Javascript_MirukenJs.vcsRoots.*
+import BuildTemplates.JavascriptPackage
+import BuildTemplates.JavascriptProject
+import BuildTemplates.configureJavascriptProject
 import Javascript_MirukenJs.vcsRoots.Javascript_MirukenJs_TeamCityPackageBuilds
-import jetbrains.buildServer.configs.kotlin.v2017_2.*
 import jetbrains.buildServer.configs.kotlin.v2017_2.Project
 import jetbrains.buildServer.configs.kotlin.v2017_2.projectFeatures.VersionedSettings
 import jetbrains.buildServer.configs.kotlin.v2017_2.projectFeatures.versionedSettings
@@ -26,4 +27,20 @@ object Project : Project({
             storeSecureParamsOutsideOfVcs = true
         }
     }
+
+    subProject(configureJavascriptProject(JavascriptProject(
+            guid              = "983f8966-9172-49d6-89b2-4ca5acbe22f8",
+            parentId          = "Javascript_MirukenJs",
+            id                = "Javascript_MirukenJs_Core",
+            name              = "Core Project",
+            codeGithubUrl     = "git@github.com:Miruken-JS/core.git",
+            npmApiKey         = "%MirukenNugetApiKey%",
+            majorVersion      = "0",
+            minorVersion      = "0",
+            patchVersion      = "4",
+            javascriptPackages = listOf(
+                    JavascriptPackage(
+                            id          = "mirukenCore",
+                            packageName = "miruken-core"
+            )))))
 })

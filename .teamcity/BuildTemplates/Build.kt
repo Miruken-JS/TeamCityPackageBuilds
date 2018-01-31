@@ -7,26 +7,21 @@ import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.VcsTrigger
 import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2017_2.*
 import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.finishBuildTrigger
-import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.VisualStudioStep
-import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.visualStudio
-import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.vstest
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.PowerShellStep
 
 
-class NugetSolution(
+class JavascriptProject(
         val guid:           String,
         val id:             String,
         val parentId:       String,
         val name:           String,
-        val solutionFile:   String,
-        val testAssemblies: String,
         val codeGithubUrl:  String,
-        val nugetApiKey:    String,
+        val npmApiKey:      String,
         val majorVersion:   String,
         val minorVersion:   String,
         val patchVersion:   String,
-        val nugetProjects:  List<NugetProject>){
+        val javascriptPackages:  List<JavascriptPackage>){
 
     val ciVcsRootId: String
         get() = "${id}_CIVCSRoot"
@@ -50,13 +45,12 @@ class NugetSolution(
         get() = "${id}_DeploymentProject"
 }
 
-class NugetProject(
+class JavascriptPackage(
         val id:          String,
-        val nuspecFile:  String,
         val packageName: String)
 
 
-fun configureNugetSolutionProject(solution: NugetSolution) : Project{
+fun configureJavascriptProject(solution: JavascriptProject) : Project{
 
     val ciVcsRoot = GitVcsRoot({
         uuid             = "${solution.guid}CIVcsRoot"
@@ -97,50 +91,18 @@ fun configureNugetSolutionProject(solution: NugetSolution) : Project{
         }
     })
 
-    fun restoreNuget(buildType: BuildType) : BuildType{
+    fun yarnInstall(buildType: BuildType) : BuildType{
         buildType.steps {
-            step {
-                name = "Restore NuGet Packages"
-                id   = "${buildType.id}_RestoreNugetStep"
-                type = "jb.nuget.installer"
-                param("toolPathSelector",          "%teamcity.tool.NuGet.CommandLine.DEFAULT%")
-                param("nuget.path",                "%teamcity.tool.NuGet.CommandLine.DEFAULT%")
-                param("nuget.sources",             "%PackageSources%")
-                param("nuget.updatePackages.mode", "sln")
-                param("sln.path",                  "%Solution%")
-            }
         }
         return buildType
     }
-    fun compile(buildType: BuildType) : BuildType{
+    fun jspmInstall(buildType: BuildType) : BuildType{
         buildType.steps {
-            visualStudio {
-                name                = "CompileStep"
-                id                  = "${buildType.id}_Build"
-                path                = "%Solution%"
-                version             = VisualStudioStep.VisualStudioVersion.vs2017
-                runPlatform         = VisualStudioStep.Platform.x86
-                msBuildVersion      = VisualStudioStep.MSBuildVersion.V15_0
-                msBuildToolsVersion = VisualStudioStep.MSBuildToolsVersion.V15_0
-                targets             = "%BuildTargets%"
-                configuration       = "%BuildConfiguration%"
-                platform            = "Any CPU"
-            }
         }
         return buildType
     }
     fun test(buildType: BuildType) : BuildType{
         buildType.steps {
-            vstest {
-                id                   = "${buildType.id}_TestStep"
-                vstestPath           = "%teamcity.dotnet.vstest.14.0%"
-                includeTestFileNames = "%TestAssemblies%"
-                runSettings          = ""
-                testCaseFilter       = "%TestCaseFilter%"
-                coverage = dotcover {
-                    toolPath = "%teamcity.tool.JetBrains.dotCover.CommandLineTools.bundled%"
-                }
-            }
         }
         return buildType
     }
@@ -224,35 +186,25 @@ fun configureNugetSolutionProject(solution: NugetSolution) : Project{
         return buildType
     }
 
-    fun dotNetBuild(buildType: BuildType) : BuildType{
-        test(compile(restoreNuget(buildType)))
+    fun javascriptBuild(buildType: BuildType) : BuildType{
+        test(jspmInstall(yarnInstall(buildType)))
 
         buildType.buildNumberPattern = "%BuildFormatSpecification%"
-
-        buildType.features {
-            feature {
-                type = "JetBrains.AssemblyInfo"
-                param("file-format",     "%DotNetAssemblyVersion%")
-                param("assembly-format", "%DotNetAssemblyVersion%")
-                param("info-format",     "%BuildFormatSpecification%")
-            }
-        }
 
         return buildType
     }
 
-    val ciBuild =  dotNetBuild(BuildType({
+    val ciBuild =  javascriptBuild(BuildType({
         uuid        = "${solution.guid}_CIBuild"
         id          = solution.ciBuildId
         name        = "CI Build"
-        description = "Watches git repo & creates a build for any change to any branch. Runs tests. Does NOT package/deploy NuGet packages!"
+        description = "Watches git repo & creates a build for any change to any branch. Runs tests. Does NOT package/deploy packages!"
 
         params {
             param("BranchSpecification", "+:refs/heads/(*)")
             param("MajorVersion",        "0")
             param("MinorVersion",        "0")
             param("PatchVersion",        "0")
-            param("PdbFilesForSymbols",  "")
             param("PrereleaseVersion",   "-CI.%build.counter%")
         }
 
@@ -272,11 +224,11 @@ fun configureNugetSolutionProject(solution: NugetSolution) : Project{
         }
     }))
 
-    val preReleaseBuild =  dotNetBuild(BuildType({
+    val preReleaseBuild =  javascriptBuild(BuildType({
         uuid          = "${solution.guid}_PreReleaseBuild"
         id            = solution.preReleaseBuildId
         name          = "PreRelease Build"
-        description   = "This will push a NuGet package with a -PreRelease tag for testing from the develop branch. NO CI.   (Note: Non-prerelease nuget packages come from the master branch)"
+        description   = "This will push a prerelease package"
         artifactRules = "%ArtifactsIn%"
 
         params {
@@ -284,34 +236,25 @@ fun configureNugetSolutionProject(solution: NugetSolution) : Project{
             +:refs/heads/(develop)
             +:refs/heads/(feature/*)
         """.trimIndent())
-            param("BuildConfiguration", "Debug")
         }
 
         vcs {
             root(preReleaseVcsRoot)
             cleanCheckout = true
         }
-
-        features {
-            feature {
-                id   = "${solution.id}_symbol-indexer"
-                type = "symbol-indexer"
-            }
-        }
     }))
 
 
-    val releaseBuild = versionBuild(tagBuild(dotNetBuild(BuildType({
+    val releaseBuild = versionBuild(tagBuild(javascriptBuild(BuildType({
         uuid          = "${solution.guid}_ReleaseBuild"
         id            = solution.releaseBuildId
         name          = "Release Build"
-        description   = "This will push a NuGet package from the MASTER branch. NO CI."
+        description   = "This will push a release package from the MASTER branch."
         artifactRules = "%ArtifactsIn%"
 
         params {
             param("BranchSpecification",              "+:refs/heads/(master)")
             param("DefaultBranch",                    "master")
-            param("NuGetPackPrereleaseVersionString", "")
             param("PrereleaseVersion",                "")
         }
 
@@ -330,11 +273,11 @@ fun configureNugetSolutionProject(solution: NugetSolution) : Project{
 
         params {
             param("SHA", "")
-            param("NugetApiKey", solution.nugetApiKey)
+            param("NpmApiKey", solution.npmApiKey)
         }
 
-        for(nugetProject in solution.nugetProjects){
-            subProject(configureNugetDeployProject(solution, nugetProject, preReleaseBuild, releaseBuild))
+        for(javascriptPackage in solution.javascriptPackages){
+            subProject(configurePackageDeployProject(solution, javascriptPackage, preReleaseBuild, releaseBuild))
         }
     })
 
@@ -343,7 +286,7 @@ fun configureNugetSolutionProject(solution: NugetSolution) : Project{
         id          = solution.id
         parentId    = solution.parentId
         name        = solution.name
-        description = "CI/CD for ${solution.solutionFile}"
+        description = "CI/CD for ${solution.name}"
 
         vcsRoot(ciVcsRoot)
         vcsRoot(preReleaseVcsRoot)
@@ -355,115 +298,63 @@ fun configureNugetSolutionProject(solution: NugetSolution) : Project{
 
         params {
             param("ArtifactsIn", """
-            Source      => Build.zip!/Source
-            packages    => Build.zip!/packages
-            ${solution.solutionFile} => Build.zip!
+            package.json => Build.zip!
         """.trimIndent())
             param("ArtifactsOut", """
-            Build.zip!/Source   => Source
-            Build.zip!/packages => packages
-            Build.zip!/${solution.solutionFile}
+            Build.zip!/package.json
         """.trimIndent())
             param("MajorVersion",        solution.majorVersion)
             param("MinorVersion",        solution.minorVersion)
             param("PatchVersion",        solution.patchVersion)
             param("PreReleaseProjectId", solution.preReleaseBuildId)
             param("ReleaseProjectId",    solution.releaseBuildId)
-            param("Solution",            solution.solutionFile)
-            param("SolutionProjectId",   solution.id)
-            param("TestAssemblies",      solution.testAssemblies)
         }
 
         subProject(deploymentProject)
     })
 }
 
-fun configureNugetDeployProject (
-        solution: NugetSolution,
-        project: NugetProject,
+fun configurePackageDeployProject(
+        javascriptProject: JavascriptProject,
+        javascriptPackage: JavascriptPackage,
         preReleaseBuild: BuildType,
         releaseBuild: BuildType) : Project{
 
-    val baseUuid = "${solution.guid}_${project.id}"
-    val baseId   = "${solution.id}_${project.id}"
+    val baseUuid = "${javascriptProject.guid}_${javascriptPackage.id}"
+    val baseId   = "${javascriptProject.id}_${javascriptPackage.id}"
 
-    fun deployPreReleaseNuget(buildType: BuildType) : BuildType{
+    fun deployPreReleasePackage(buildType: BuildType) : BuildType{
 
         buildType.steps {
-            step {
-                name = "Prerelease Nuget on TC Feed"
-                id = "${buildType.id}_PrereleaseNugetStep"
-                type = "jb.nuget.pack"
-                param("toolPathSelector",            "%teamcity.tool.NuGet.CommandLine.DEFAULT%")
-                param("nuget.pack.output.clean",     "true")
-                param("nuget.pack.specFile",         "%NuGetPackSpecFiles%")
-                param("nuget.pack.output.directory", "nupkg")
-                param("nuget.path",                  "%teamcity.tool.NuGet.CommandLine.DEFAULT%")
-                param("nuget.pack.as.artifact",      "true")
-                param("nuget.pack.prefer.project",   "true")
-                param("nuget.pack.version",          "%PackageVersion%")
-            }
         }
 
         return buildType
     }
 
-    fun deployReleaseNuget(apiKey: String, buildType: BuildType) : BuildType{
+    fun deployReleasePackage(apiKey: String, buildType: BuildType) : BuildType{
 
         buildType.steps {
-            step {
-                name = "NuGet Pack for NuGet.org"
-                id   = "${buildType.id}_ReleasePackStep"
-                type = "jb.nuget.pack"
-                param("toolPathSelector",            "%teamcity.tool.NuGet.CommandLine.DEFAULT%")
-                param("nuget.pack.output.clean",     "true")
-                param("nuget.pack.specFile",         "%NuGetPackSpecFiles%")
-                param("nuget.pack.include.sources",  "true")
-                param("nuget.pack.output.directory", "nupkg")
-                param("nuget.path",                  "%teamcity.tool.NuGet.CommandLine.DEFAULT%")
-                param("nuget.pack.prefer.project",   "true")
-                param("nuget.pack.version",          "%PackageVersion%")
-            }
-            step {
-                name = "Nuget Publish to NuGet.org"
-                id   = "${buildType.id}_ReleasePublishNugetStep"
-                type = "jb.nuget.publish"
-                param("secure:nuget.api.key", apiKey)
-                param("toolPathSelector",     "%teamcity.tool.NuGet.CommandLine.DEFAULT%")
-                param("nuget.path",           "%teamcity.tool.NuGet.CommandLine.DEFAULT%")
-                param("nuget.publish.source", "nuget.org")
-                param("nuget.publish.files",  "nupkg/%NupkgName%")
-            }
-            step {
-                name = "Nuget Publish to SymbolSource.org"
-                id   = "${buildType.id}_ReleasePublishSymbolsStep"
-                type = "jb.nuget.publish"
-                param("secure:nuget.api.key", apiKey)
-                param("nuget.path",           "%teamcity.tool.NuGet.CommandLine.DEFAULT%")
-                param("nuget.publish.source", "https://nuget.smbsrc.net/")
-                param("nuget.publish.files",  "nupkg/%NupkgSymbolsName%")
-            }
         }
 
         return buildType
     }
 
-    val deployPreRelease =  deployPreReleaseNuget(BuildType({
+    val deployPreRelease =  deployPreReleasePackage(BuildType({
         uuid               = "${baseUuid}_DeployPreRelease"
         id                 = "${baseId}_DeployPreRelease"
         name               = "Deploy PreRelease"
-        description        = "This will push a NuGet package with a -PreRelease tag for testing from the develop branch. NO CI.   (Note: Non-prerelease nuget packages come from the master branch)"
+        description        = "This will push a package with a -PreRelease tag"
         buildNumberPattern = "%BuildFormatSpecification%"
 
         params {
-            param("BuildFormatSpecification", "%dep.${solution.preReleaseBuildId}.BuildFormatSpecification%")
-            param("PackageVersion",           "%dep.${solution.preReleaseBuildId}.PackageVersion%")
+            param("BuildFormatSpecification", "%dep.${javascriptProject.preReleaseBuildId}.BuildFormatSpecification%")
+            param("PackageVersion",           "%dep.${javascriptProject.preReleaseBuildId}.PackageVersion%")
         }
 
         triggers {
             finishBuildTrigger {
                 id = "${baseId}_DeployPreRelease_TRIGGER"
-                buildTypeExtId = solution.preReleaseBuildId
+                buildTypeExtId = javascriptProject.preReleaseBuildId
                 successfulOnly = true
                 branchFilter = "+:*"
             }
@@ -482,24 +373,24 @@ fun configureNugetDeployProject (
         }
     }))
 
-    val deployRelease = deployReleaseNuget(solution.nugetApiKey, BuildType({
+    val deployRelease = deployReleasePackage(javascriptProject.npmApiKey, BuildType({
         uuid         = "${baseUuid}_DeployRelease"
         id           = "${baseId}_DeployRelease"
         name         = "Deploy Release"
-        description  = "This will push a NuGet package from the MASTER branch. NO CI."
+        description  = "This will push a release package from the MASTER branch. NO CI."
 
         buildNumberPattern = "%BuildFormatSpecification%"
 
         params {
-            param("BuildFormatSpecification", "%dep.${solution.releaseBuildId}.BuildFormatSpecification%")
-            param("PackageVersion",           "%dep.${solution.releaseBuildId}.PackageVersion%")
+            param("BuildFormatSpecification", "%dep.${javascriptProject.releaseBuildId}.BuildFormatSpecification%")
+            param("PackageVersion",           "%dep.${javascriptProject.releaseBuildId}.PackageVersion%")
             param("PrereleaseVersion",        "")
         }
 
         triggers {
             finishBuildTrigger {
                 id             = "${baseId}_Release_TRIGGER"
-                buildTypeExtId = solution.releaseBuildId
+                buildTypeExtId = javascriptProject.releaseBuildId
                 branchFilter   = "+:master"
             }
         }
@@ -520,16 +411,15 @@ fun configureNugetDeployProject (
     return Project({
         uuid        = baseUuid
         id          = baseId
-        parentId    = solution.deploymentProjectId
-        name        = project.packageName
-        description = "${project.packageName} nuget package"
+        parentId    = javascriptProject.deploymentProjectId
+        name        = javascriptPackage.packageName
+        description = "${javascriptPackage.packageName} npm package"
 
         buildType(deployPreRelease)
         buildType(deployRelease)
 
         params {
-            param("NuGetPackSpecFiles", project.nuspecFile)
-            param("PackageName",        project.packageName)
+            param("PackageName",        javascriptPackage.packageName)
         }
     })
 }
