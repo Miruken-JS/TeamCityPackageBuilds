@@ -322,7 +322,6 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
 
         params {
             param("SHA", "")
-            param("NpmApiKey", solution.npmApiKey)
         }
 
         for(javascriptPackage in solution.javascriptPackages){
