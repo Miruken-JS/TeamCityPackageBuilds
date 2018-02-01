@@ -64,7 +64,6 @@ changeBuildType("983f8966-9172-49d6-89b2-4ca5acbe22f8_PreReleaseBuild") {
                         Write-Host "buildNumber: ${'$'}buildNumber"
                     
                         Write-Host "##teamcity[setParameter name='GitShortHash' value='${'$'}shortHash']"
-                        Write-Host "##teamcity[setParameter name='BuildFormatSpecification' value='${'$'}buildNumber']"
                         Write-Host "##teamcity[buildNumber '${'$'}buildNumber']"
                     } catch {
                         return 1
