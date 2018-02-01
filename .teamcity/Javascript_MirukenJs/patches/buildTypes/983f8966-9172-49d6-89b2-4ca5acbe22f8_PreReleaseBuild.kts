@@ -1,6 +1,8 @@
 package Javascript_MirukenJs.patches.buildTypes
 
 import jetbrains.buildServer.configs.kotlin.v2017_2.*
+import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.PowerShellStep
+import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2017_2.ui.*
@@ -50,18 +52,46 @@ changeBuildType("983f8966-9172-49d6-89b2-4ca5acbe22f8_PreReleaseBuild") {
         }
     }
     steps {
-        insert(0) {
+        update<PowerShellStep>(0) {
+            scriptMode = script {
+                content = """
+                    ${'$'}hash - "%build.vcs.number%"
+                    ${'$'}shortHash = ${'$'}hash.substring(0,7)
+                    Write-Host "##teamcity[setParameter name='GitShortHash' value='${'$'}ShortHash']"
+                """.trimIndent()
+            }
+            param("jetbrains_powershell_scriptArguments", "")
+        }
+        insert(1) {
             powerShell {
-                name = "Calculate GitShortHash"
+                name = "Set Package Version"
                 formatStderrAsError = true
                 scriptMode = script {
                     content = """
-                        ${'$'}hash - "%build.vcs.number%"
-                        ${'$'}shortHash = ${'$'}hash.substring(0,7)
-                        Write-Host "##teamcity[setParameter name='GitShortHash' value='${'$'}ShortHash']"
+                        ${'$'}version = ${'$'}args[0]
+                        
+                        if(!${'$'}version){
+                            throw "version is empty"
+                        }
+                        
+                        ${'$'}package = Get-Content "package.json" -Raw
+                        ${'$'}updated = ${'$'}package -replace '"(version)"\s*:\s*"(.*)"', ${TQ}version"": ""${'$'}version$TQ
+                        ${'$'}updated | Set-Content 'package.json'
+                        
+                        Write-Host "Updated package.json to version ${'$'}version"
                     """.trimIndent()
                 }
+                param("jetbrains_powershell_scriptArguments", "%PackageVersion%")
             }
+        }
+        update<ScriptBuildStep>(2) {
+            enabled = false
+        }
+        update<ScriptBuildStep>(3) {
+        }
+        update<ScriptBuildStep>(4) {
+        }
+        update<ScriptBuildStep>(5) {
         }
     }
 }
