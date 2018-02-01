@@ -12,6 +12,11 @@ To apply the patch, change the buildType with uuid = '983f8966-9172-49d6-89b2-4c
 accordingly and delete the patch script.
 */
 changeBuildType("983f8966-9172-49d6-89b2-4ca5acbe22f8_PreReleaseBuild") {
+    check(maxRunningBuilds == 0) {
+        "Unexpected option value: maxRunningBuilds = $maxRunningBuilds"
+    }
+    maxRunningBuilds = 1
+
     expectSteps {
         script {
             name = "Yarn Install"
