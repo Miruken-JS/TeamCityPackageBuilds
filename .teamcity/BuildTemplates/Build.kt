@@ -359,6 +359,7 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
             param("PatchVersion",        solution.patchVersion)
             param("PreReleaseProjectId", solution.preReleaseBuildId)
             param("ReleaseProjectId",    solution.releaseBuildId)
+            param("SolutionProjectId",   solution.id)
         }
 
         subProject(deploymentProject)
