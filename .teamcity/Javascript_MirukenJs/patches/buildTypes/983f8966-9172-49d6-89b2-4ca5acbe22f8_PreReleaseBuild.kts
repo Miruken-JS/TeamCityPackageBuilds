@@ -102,7 +102,6 @@ changeBuildType("983f8966-9172-49d6-89b2-4ca5acbe22f8_PreReleaseBuild") {
             }
         }
         update<ScriptBuildStep>(2) {
-            enabled = false
         }
         update<ScriptBuildStep>(3) {
             enabled = false
