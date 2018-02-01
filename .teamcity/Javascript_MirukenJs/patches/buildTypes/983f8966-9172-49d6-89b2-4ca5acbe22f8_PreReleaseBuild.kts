@@ -34,43 +34,10 @@ changeBuildType("983f8966-9172-49d6-89b2-4ca5acbe22f8_PreReleaseBuild") {
             }
             param("jetbrains_powershell_scriptArguments", "%PackageVersion%")
         }
-        script {
-            name = "Yarn Install"
-            scriptContent = "%yarn% install"
-        }
-        script {
-            name = "JSPM Install"
-            scriptContent = "%jspm% install"
-        }
-        script {
-            name = "Test"
-            scriptContent = "%gulp% test"
-        }
-        script {
-            name = "Build"
-            scriptContent = "%gulp% build"
-        }
     }
     steps {
         update<PowerShellStep>(0) {
             scriptMode = script {
-                content = """
-                    try {
-                        ${'$'}hash = "%system.build.vcs.number%"
-                        ${'$'}shortHash = ${'$'}hash.substring(0,7)
-                        ${'$'}buildNumber = "%SemanticVersion%%PrereleaseVersion%-${'$'}shortHash"
-                        
-                        Write-Host "shortHash: ${'$'}shortHash"
-                        Write-Host "buildNumber: ${'$'}buildNumber"
-                    
-                        Write-Host "##teamcity[setParameter name='GitShortHash' value='${'$'}shortHash']"
-                        Write-Host "##teamcity[buildNumber '${'$'}buildNumber']"
-                    } catch {
-                        return 1
-                    }
-                    
-                    return 0
-                """.trimIndent()
             }
             param("jetbrains_powershell_scriptArguments", "")
         }
@@ -79,35 +46,9 @@ changeBuildType("983f8966-9172-49d6-89b2-4ca5acbe22f8_PreReleaseBuild") {
                 name = "Set Package Version"
                 formatStderrAsError = true
                 scriptMode = script {
-                    content = """
-                        try {
-                            ${'$'}version = ${'$'}args[0]
-                        
-                            if(!${'$'}version){
-                                throw "version is empty"
-                            }
-                        
-                            ${'$'}package = Get-Content "package.json" -Raw
-                            ${'$'}updated = ${'$'}package -replace '"(version)"\s*:\s*"(.*)"', ${TQ}version"": ""${'$'}version$TQ
-                            ${'$'}updated | Set-Content 'package.json'
-                        
-                            Write-Host "Updated package.json to version ${'$'}version"
-                        } catch {
-                            return 1
-                        }
-                        return 0
-                    """.trimIndent()
                 }
                 param("jetbrains_powershell_scriptArguments", "%PackageVersion%")
             }
-        }
-        update<ScriptBuildStep>(2) {
-        }
-        update<ScriptBuildStep>(3) {
-        }
-        update<ScriptBuildStep>(4) {
-        }
-        update<ScriptBuildStep>(5) {
         }
     }
 }

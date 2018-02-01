@@ -11,14 +11,12 @@ import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.PowerShellStep
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.script
 
-
 class JavascriptProject(
         val guid:           String,
         val id:             String,
         val parentId:       String,
         val name:           String,
         val codeGithubUrl:  String,
-        val npmApiKey:      String,
         val majorVersion:   String,
         val minorVersion:   String,
         val patchVersion:   String,
@@ -130,6 +128,34 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
         return buildType
     }
 
+    fun gitShortHash(buildType: BuildType) : BuildType{
+        buildType.steps {
+            powerShell {
+                name                = "Git Short Hash"
+                formatStderrAsError = true
+                scriptMode = script {
+                    content = """
+                        try {
+                            ${'$'}hash = "%system.build.vcs.number%"
+                            ${'$'}shortHash = ${'$'}hash.substring(0,7)
+                            ${'$'}buildNumber = "%SemanticVersion%%PrereleaseVersion%-${'$'}shortHash"
+
+                            Write-Host "shortHash: ${'$'}shortHash"
+                            Write-Host "buildNumber: ${'$'}buildNumber"
+
+                            Write-Host "##teamcity[setParameter name='GitShortHash' value='${'$'}shortHash']"
+                            Write-Host "##teamcity[buildNumber '${'$'}buildNumber']"
+                        } catch {
+                            return 1
+                        }
+                        return 0
+                    """.trimIndent()
+                }
+            }
+        }
+        return buildType
+    }
+
     fun setPackageVersion(buildType: BuildType) : BuildType{
         buildType.steps {
             powerShell {
@@ -137,17 +163,22 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
                 formatStderrAsError = true
                 scriptMode = script {
                     content = """
-                        ${'$'}version = ${'$'}args[0]
+                        try {
+                            ${'$'}version = ${'$'}args[0]
 
-                        if(!${'$'}version){
-                            throw "version is empty"
+                            if(!${'$'}version){
+                                throw "version is empty"
+                            }
+
+                            ${'$'}package = Get-Content "package.json" -Raw
+                            ${'$'}updated = ${'$'}package -replace '"(version)"\s*:\s*"(.*)"', ${TQ}version"": ""${'$'}version$TQ
+                            ${'$'}updated | Set-Content 'package.json'
+
+                            Write-Host "Updated package.json to version ${'$'}version"
+                        } catch {
+                            return 1
                         }
-
-                        ${'$'}package = Get-Content "package.json" -Raw
-                        ${'$'}updated = ${'$'}package -replace '"(version)"\s*:\s*"(.*)"', ${TQ}version"": ""${'$'}version$TQ
-                        ${'$'}updated | Set-Content 'package.json'
-
-                        Write-Host "Updated package.json to version ${'$'}version"
+                        return 0
                     """.trimIndent()
                 }
                 param("jetbrains_powershell_scriptArguments", "%PackageVersion%")
@@ -236,7 +267,7 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
     }
 
     fun javascriptBuild(buildType: BuildType) : BuildType{
-        build(test(jspmInstall(yarnInstall(setPackageVersion(buildType)))))
+        build(test(jspmInstall(yarnInstall(setPackageVersion(gitShortHash(buildType))))))
 
         buildType.buildNumberPattern = "%BuildFormatSpecification%"
 
@@ -359,6 +390,8 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
             param("PreReleaseProjectId", solution.preReleaseBuildId)
             param("ReleaseProjectId",    solution.releaseBuildId)
             param("SolutionProjectId",   solution.id)
+            param("PrereleaseVersion",   "-alpha.%build.counter%")
+            param("SHA",                 "%GitShortHash%")
         }
 
         subProject(deploymentProject)
@@ -374,23 +407,43 @@ fun configurePackageDeployProject(
     val baseUuid = "${javascriptProject.guid}_${javascriptPackage.id}"
     val baseId   = "${javascriptProject.id}_${javascriptPackage.id}"
 
+    fun packPackage(buildType: BuildType) : BuildType{
+
+        buildType.steps {
+            script {
+                name          = "Pack"
+                scriptContent = "%npm% pack"
+            }
+        }
+
+        return buildType
+    }
+
     fun deployPreReleasePackage(buildType: BuildType) : BuildType{
 
         buildType.steps {
+            script {
+                name          = "Publish PreRelease"
+                scriptContent = "%npm% publish %PackageName%-%PackageVersion%.tgz --tag prerelease"
+            }
         }
 
         return buildType
     }
 
-    fun deployReleasePackage(apiKey: String, buildType: BuildType) : BuildType{
+    fun deployReleasePackage(buildType: BuildType) : BuildType{
 
         buildType.steps {
+            script {
+                name          = "Publish Release"
+                scriptContent = "%npm% publish %PackageName%-%PackageVersion%.tgz --tag latest"
+            }
         }
 
         return buildType
     }
 
-    val deployPreRelease =  deployPreReleasePackage(BuildType({
+    val deployPreRelease =  deployPreReleasePackage(packPackage(BuildType({
         uuid               = "${baseUuid}_DeployPreRelease"
         id                 = "${baseId}_DeployPreRelease"
         name               = "Deploy PreRelease"
@@ -417,14 +470,15 @@ fun configurePackageDeployProject(
                 }
 
                 artifacts {
-                    id            = "${baseId}_PreRelease_ARTIFACT_DEPENDENCY"
-                    artifactRules = "%ArtifactsOut%"
+                    id               = "${baseId}_PreRelease_ARTIFACT_DEPENDENCY"
+                    cleanDestination = true
+                    artifactRules    = "%ArtifactsOut%"
                 }
             }
         }
-    }))
+    })))
 
-    val deployRelease = deployReleasePackage(javascriptProject.npmApiKey, BuildType({
+    val deployRelease = deployReleasePackage(packPackage(BuildType({
         uuid         = "${baseUuid}_DeployRelease"
         id           = "${baseId}_DeployRelease"
         name         = "Deploy Release"
@@ -452,12 +506,13 @@ fun configurePackageDeployProject(
                 }
 
                 artifacts {
-                    id            = "${baseId}_Release_ARTIFACT_DEPENDENCY"
-                    artifactRules = "%ArtifactsOut%"
+                    id               = "${baseId}_Release_ARTIFACT_DEPENDENCY"
+                    cleanDestination = true
+                    artifactRules    = "%ArtifactsOut%"
                 }
             }
         }
-    }))
+    })))
 
     return Project({
         uuid        = baseUuid

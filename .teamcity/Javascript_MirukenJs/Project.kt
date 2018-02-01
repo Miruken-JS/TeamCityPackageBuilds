@@ -34,7 +34,6 @@ object Project : Project({
             id                = "Javascript_MirukenJs_Core2",
             name              = "Core Project",
             codeGithubUrl     = "git@github.com:Miruken-JS/core.git",
-            npmApiKey         = "%MirukenNugetApiKey%",
             majorVersion      = "0",
             minorVersion      = "0",
             patchVersion      = "4",
