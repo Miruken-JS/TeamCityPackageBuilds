@@ -55,16 +55,22 @@ changeBuildType("983f8966-9172-49d6-89b2-4ca5acbe22f8_PreReleaseBuild") {
         update<PowerShellStep>(0) {
             scriptMode = script {
                 content = """
-                    ${'$'}hash - "%build.vcs.number%"
-                    ${'$'}shortHash = ${'$'}hash.substring(0,7)
-                    Write-Host "##teamcity[setParameter name='GitShortHash' value='${'$'}ShortHash']"
+                    try {
+                        ${'$'}hash = "52e294b1eb8e696f75c1af90b6586e0020453e13"
+                        ${'$'}shortHash = ${'$'}hash.substring(0,7)
+                        Write-Host "##teamcity[setParameter name='GitShortHash' value='${'$'}ShortHash']"
+                    } catch {
+                        return 1
+                    }
+                    
+                    return 0
                 """.trimIndent()
             }
             param("jetbrains_powershell_scriptArguments", "")
         }
         insert(1) {
             powerShell {
-                name = "Set Package Version"
+                name = "Set Package Version (1)"
                 formatStderrAsError = true
                 scriptMode = script {
                     content = """
