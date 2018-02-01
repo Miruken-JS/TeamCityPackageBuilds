@@ -76,7 +76,7 @@ changeBuildType("983f8966-9172-49d6-89b2-4ca5acbe22f8_PreReleaseBuild") {
         }
         insert(1) {
             powerShell {
-                name = "Set Package Version (1)"
+                name = "Set Package Version"
                 formatStderrAsError = true
                 scriptMode = script {
                     content = """
