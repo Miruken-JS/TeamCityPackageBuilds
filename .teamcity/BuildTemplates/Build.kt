@@ -130,7 +130,33 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
         return buildType
     }
 
-    fun versionBuild(buildType: BuildType) : BuildType{
+    fun setPackageVersion(buildType: BuildType) : BuildType{
+        buildType.steps {
+            powerShell {
+                name                = "Set Package Version"
+                formatStderrAsError = true
+                scriptMode = script {
+                    content = """
+                        ${'$'}version = ${'$'}args[0]
+
+                        if(!${'$'}version){
+                            throw "version is empty"
+                        }
+
+                        ${'$'}package = Get-Content "package.json" -Raw
+                        ${'$'}updated = ${'$'}package -replace '"(version)"\s*:\s*"(.*)"', ${TQ}version"": ""${'$'}version$TQ
+                        ${'$'}updated | Set-Content 'package.json'
+
+                        Write-Host "Updated package.json to version ${'$'}version"
+                    """.trimIndent()
+                }
+                param("jetbrains_powershell_scriptArguments", "%PackageVersion%")
+            }
+        }
+        return buildType
+    }
+
+    fun incrementProjectPatchVersion(buildType: BuildType) : BuildType{
         buildType.steps {
             powerShell {
                 name     = "Increment PatchVersion And Reset Build Counters"
@@ -210,7 +236,7 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
     }
 
     fun javascriptBuild(buildType: BuildType) : BuildType{
-        build(test(jspmInstall(yarnInstall(buildType))))
+        build(test(jspmInstall(yarnInstall(setPackageVersion(buildType)))))
 
         buildType.buildNumberPattern = "%BuildFormatSpecification%"
 
@@ -268,7 +294,7 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
     }))
 
 
-    val releaseBuild = versionBuild(tagBuild(javascriptBuild(BuildType({
+    val releaseBuild = incrementProjectPatchVersion(tagBuild(javascriptBuild(BuildType({
         uuid          = "${solution.guid}_ReleaseBuild"
         id            = solution.releaseBuildId
         name          = "Release Build"
