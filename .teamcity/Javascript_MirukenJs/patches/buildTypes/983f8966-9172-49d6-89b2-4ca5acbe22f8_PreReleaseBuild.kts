@@ -88,10 +88,13 @@ changeBuildType("983f8966-9172-49d6-89b2-4ca5acbe22f8_PreReleaseBuild") {
             enabled = false
         }
         update<ScriptBuildStep>(3) {
+            enabled = false
         }
         update<ScriptBuildStep>(4) {
+            enabled = false
         }
         update<ScriptBuildStep>(5) {
+            enabled = false
         }
     }
 }
