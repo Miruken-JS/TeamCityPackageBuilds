@@ -74,17 +74,22 @@ changeBuildType("983f8966-9172-49d6-89b2-4ca5acbe22f8_PreReleaseBuild") {
                 formatStderrAsError = true
                 scriptMode = script {
                     content = """
-                        ${'$'}version = ${'$'}args[0]
+                        try {
+                            ${'$'}version = ${'$'}args[0]
                         
-                        if(!${'$'}version){
-                            throw "version is empty"
+                            if(!${'$'}version){
+                                throw "version is empty"
+                            }
+                        
+                            ${'$'}package = Get-Content "package.json" -Raw
+                            ${'$'}updated = ${'$'}package -replace '"(version)"\s*:\s*"(.*)"', ${TQ}version"": ""${'$'}version$TQ
+                            ${'$'}updated | Set-Content 'package.json'
+                        
+                            Write-Host "Updated package.json to version ${'$'}version"
+                        } catch {
+                            return 1
                         }
-                        
-                        ${'$'}package = Get-Content "package.json" -Raw
-                        ${'$'}updated = ${'$'}package -replace '"(version)"\s*:\s*"(.*)"', ${TQ}version"": ""${'$'}version$TQ
-                        ${'$'}updated | Set-Content 'package.json'
-                        
-                        Write-Host "Updated package.json to version ${'$'}version"
+                        return 0
                     """.trimIndent()
                 }
                 param("jetbrains_powershell_scriptArguments", "%PackageVersion%")
