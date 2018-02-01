@@ -1,6 +1,7 @@
 package Javascript_MirukenJs.patches.buildTypes
 
 import jetbrains.buildServer.configs.kotlin.v2017_2.*
+import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2017_2.ui.*
@@ -49,8 +50,16 @@ changeBuildType("983f8966-9172-49d6-89b2-4ca5acbe22f8_PreReleaseBuild") {
                         Write-Host "Updated package.json to version ${'$'}version"
                     """.trimIndent()
                 }
-                param("jetbrains_powershell_scriptArguments", "%SemanticVersion%")
+                param("jetbrains_powershell_scriptArguments", "%PackageVersion%")
             }
+        }
+        update<ScriptBuildStep>(1) {
+        }
+        update<ScriptBuildStep>(2) {
+        }
+        update<ScriptBuildStep>(3) {
+        }
+        update<ScriptBuildStep>(4) {
         }
     }
 }
