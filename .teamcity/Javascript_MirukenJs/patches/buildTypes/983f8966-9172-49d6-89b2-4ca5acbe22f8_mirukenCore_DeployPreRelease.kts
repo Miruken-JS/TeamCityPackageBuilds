@@ -22,7 +22,7 @@ changeBuildType("983f8966-9172-49d6-89b2-4ca5acbe22f8_mirukenCore_DeployPreRelea
         insert(1) {
             script {
                 name = "Publish"
-                scriptContent = "%npm% publish --tag prerelease"
+                scriptContent = "%npm% publish %PackageName%-%PackageVersion%.tgz --tag prerelease"
             }
         }
     }
