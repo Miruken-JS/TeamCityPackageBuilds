@@ -56,11 +56,15 @@ changeBuildType("983f8966-9172-49d6-89b2-4ca5acbe22f8_PreReleaseBuild") {
             scriptMode = script {
                 content = """
                     try {
-                        ${'$'}hash = "52e294b1eb8e696f75c1af90b6586e0020453e13"
+                        ${'$'}hash = "%system.build.vcs.number%"
                         ${'$'}shortHash = ${'$'}hash.substring(0,7)
-                        Write-Host "shortHash ${'$'}shortHash"
+                        ${'$'}buildNumber = "%SemanticVersion%%PrereleaseVersion%-${'$'}shortHash"
+                        
+                        Write-Host "shortHash: ${'$'}shortHash"
+                        Write-Host "buildNumber: ${'$'}buildNumber"
+                    
                         Write-Host "##teamcity[setParameter name='GitShortHash' value='${'$'}shortHash']"
-                        Write-Host "##teamcity[GitShortHash '${'$'}shortHash']"
+                        Write-Host "##teamcity[buildNumber '${'$'}buildNumber']"
                     } catch {
                         return 1
                     }
