@@ -26,4 +26,25 @@ changeBuildType("983f8966-9172-49d6-89b2-4ca5acbe22f8_mirukenCore_DeployPreRelea
             }
         }
     }
+
+    dependencies {
+        expect("Javascript_MirukenJs_Core2_PreReleaseBuild") {
+            snapshot {
+            }
+
+            artifacts {
+                artifactRules = "%ArtifactsOut%"
+            }
+        }
+        update("Javascript_MirukenJs_Core2_PreReleaseBuild") {
+            snapshot {
+            }
+
+            artifacts {
+                cleanDestination = true
+                artifactRules = "%ArtifactsOut%"
+            }
+        }
+
+    }
 }
