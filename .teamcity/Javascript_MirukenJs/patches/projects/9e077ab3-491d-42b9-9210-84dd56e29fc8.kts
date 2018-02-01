@@ -12,6 +12,9 @@ accordingly and delete the patch script.
 changeProject("9e077ab3-491d-42b9-9210-84dd56e29fc8") {
     params {
         add {
+            param("PrereleaseVersion", "-alpha.%build.counter%")
+        }
+        add {
             param("SHA", "%GitShortHash%")
         }
     }
