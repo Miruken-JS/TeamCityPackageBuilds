@@ -365,7 +365,7 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
         id          = solution.id
         parentId    = solution.parentId
         name        = solution.name
-        description = "CI/CD for ${solution.name}"
+        description = "CI/CD"
 
         vcsRoot(ciVcsRoot)
         vcsRoot(preReleaseVcsRoot)
