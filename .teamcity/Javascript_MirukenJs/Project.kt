@@ -41,5 +41,20 @@ object Project : Project({
                     JavascriptPackage(
                             id          = "mirukenCore",
                             packageName = "miruken-core"
+                    )))))
+
+    subProject(configureJavascriptProject(JavascriptProject(
+            guid              = "c5fd1e3a-3ee5-4adb-9695-b4fc50557247",
+            parentId          = "Javascript_MirukenJs",
+            id                = "Javascript_MirukenJs_Callback",
+            name              = "Callback Project",
+            codeGithubUrl     = "git@github.com:Miruken-JS/callback.git",
+            majorVersion      = "0",
+            minorVersion      = "0",
+            patchVersion      = "4",
+            javascriptPackages = listOf(
+                    JavascriptPackage(
+                            id          = "mirukenCallback",
+                            packageName = "miruken-callback"
             )))))
 })
