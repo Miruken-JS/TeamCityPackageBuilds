@@ -25,8 +25,8 @@ object Project : Project({
             patchVersion      = "24",
             javascriptPackages = listOf(
                     JavascriptPackage(
-                        id          = "mirukenEs5Angular",
-                        packageName = "miruken-es5-angular"
+                        id          = "mirukenEs5",
+                        packageName = "miruken-es5"
                     ),
                     JavascriptPackage(
                         id          = "mirukenEs5Angular",
