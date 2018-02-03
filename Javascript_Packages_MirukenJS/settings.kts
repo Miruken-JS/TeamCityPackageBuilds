@@ -1,4 +1,4 @@
-package Javascript_Packages_MirukenJS
+package Javascript_Packages_MirukenJs
 
 import jetbrains.buildServer.configs.kotlin.v2017_2.*
 
