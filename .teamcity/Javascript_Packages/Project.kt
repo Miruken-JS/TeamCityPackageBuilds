@@ -1,16 +1,16 @@
-package Javascript_MirukenJs
+package Javascript_Packages
 
 import BuildTemplates.JavascriptPackage
 import BuildTemplates.JavascriptProject
 import BuildTemplates.configureJavascriptProject
-import Javascript_MirukenJs.vcsRoots.Javascript_MirukenJs_TeamCityPackageBuilds
+import Javascript_Packages.vcsRoots.Javascript_MirukenJs_TeamCityPackageBuilds
 import jetbrains.buildServer.configs.kotlin.v2017_2.Project
 import jetbrains.buildServer.configs.kotlin.v2017_2.projectFeatures.VersionedSettings
 import jetbrains.buildServer.configs.kotlin.v2017_2.projectFeatures.versionedSettings
 
 object Project : Project({
     uuid = "9e077ab3-491d-42b9-9210-84dd56e29fc8"
-    id = "Javascript_MirukenJs"
+    id = "Javascript_Packages"
     parentId = "Javascript"
     name = "Miruken-JS"
 
@@ -30,7 +30,7 @@ object Project : Project({
 
     subProject(configureJavascriptProject(JavascriptProject(
             guid              = "983f8966-9172-49d6-89b2-4ca5acbe22f8",
-            parentId          = "Javascript_MirukenJs",
+            parentId          = "Javascript_Packages",
             id                = "Javascript_MirukenJs_Core2",
             name              = "Core Project",
             codeGithubUrl     = "git@github.com:Miruken-JS/core.git",
@@ -45,7 +45,7 @@ object Project : Project({
 
     subProject(configureJavascriptProject(JavascriptProject(
             guid              = "c5fd1e3a-3ee5-4adb-9695-b4fc50557247",
-            parentId          = "Javascript_MirukenJs",
+            parentId          = "Javascript_Packages",
             id                = "Javascript_MirukenJs_Callback",
             name              = "Callback Project",
             codeGithubUrl     = "git@github.com:Miruken-JS/callback.git",

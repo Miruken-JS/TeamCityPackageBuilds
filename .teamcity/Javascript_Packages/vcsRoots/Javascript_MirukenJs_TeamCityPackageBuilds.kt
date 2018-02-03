@@ -1,6 +1,5 @@
-package Javascript_MirukenJs.vcsRoots
+package Javascript_Packages.vcsRoots
 
-import jetbrains.buildServer.configs.kotlin.v2017_2.*
 import jetbrains.buildServer.configs.kotlin.v2017_2.vcs.GitVcsRoot
 
 object Javascript_MirukenJs_TeamCityPackageBuilds : GitVcsRoot({

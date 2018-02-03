@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Javascript_MirukenJs Config DSL Script</name>
+  <name>Javascript_Packages Config DSL Script</name>
   <groupId>Javascript_MirukenJs</groupId>
   <artifactId>Javascript_MirukenJs_dsl</artifactId>
   <version>1.0-SNAPSHOT</version>

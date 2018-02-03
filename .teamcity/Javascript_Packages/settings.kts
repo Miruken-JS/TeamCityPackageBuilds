@@ -1,4 +1,4 @@
-package Javascript_MirukenJs
+package Javascript_Packages
 
 import jetbrains.buildServer.configs.kotlin.v2017_2.*
 
@@ -32,4 +32,4 @@ the 'Debug' option is available in the context menu for the task.
 */
 
 version = "2017.2"
-project(Javascript_MirukenJs.Project)
+project(Javascript_Packages.Project)
