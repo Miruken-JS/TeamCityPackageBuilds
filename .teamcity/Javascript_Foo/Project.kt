@@ -5,7 +5,7 @@ import jetbrains.buildServer.configs.kotlin.v2017_2.Project
 object Project : Project({
     uuid = "6469cc81-0845-45da-b3fb-18a429b2123a"
     id = "Javascript_Foo"
-    parentId = "Javascript"
+    parentId = "Javascript_MirukenJs"
     name = "Foo"
 
 //    subProject(configureJavascriptProject(JavascriptProject(
