@@ -1,15 +1,12 @@
-package Javascript_MirukenEs5
+package Javascript_Foo
 
-import BuildTemplates.JavascriptPackage
-import BuildTemplates.JavascriptProject
-import BuildTemplates.configureJavascriptProject
 import jetbrains.buildServer.configs.kotlin.v2017_2.Project
 
 object Project : Project({
     uuid = "6469cc81-0845-45da-b3fb-18a429b2123a"
-    id = "Javascript_MirukenEs5"
+    id = "Javascript_Foo"
     parentId = "Javascript"
-    name = "Miruken-ES5-2"
+    name = "Foo"
 
 //    subProject(configureJavascriptProject(JavascriptProject(
 //            guid              = "2992abf2-e74a-44e6-950a-30f41d7bfff5",
