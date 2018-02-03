@@ -12,7 +12,7 @@ object Project : Project({
     uuid = "9e077ab3-491d-42b9-9210-84dd56e29fc8"
     id = "Javascript_Packages"
     parentId = "Javascript"
-    name = "Miruken-JS"
+    name = "Packages"
 
     vcsRoot(Javascript_MirukenJs_TeamCityPackageBuilds)
 
