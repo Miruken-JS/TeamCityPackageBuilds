@@ -2,95 +2,12 @@ package BuildTemplates
 
 import jetbrains.buildServer.configs.kotlin.v2017_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2017_2.Project
-import jetbrains.buildServer.configs.kotlin.v2017_2.vcs.GitVcsRoot
 import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.VcsTrigger
 import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2017_2.*
 import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.finishBuildTrigger
-import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.powerShell
-import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.PowerShellStep
-import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.script
-
-class JavascriptProject(
-        val guid:           String,
-        val id:             String,
-        val parentId:       String,
-        val name:           String,
-        val codeGithubUrl:  String,
-        val majorVersion:   String,
-        val minorVersion:   String,
-        val patchVersion:   String,
-        val javascriptPackages:  List<JavascriptPackage>){
-
-    val ciVcsRootId: String
-        get() = "${id}_CIVCSRoot"
-
-    val preReleaseVcsRootId: String
-        get() = "${id}_PreReleaseVCSRoot"
-
-    val releaseVcsRootId: String
-        get() = "${id}_ReleaseVCSRoot"
-
-    val ciBuildId: String
-        get() = "${id}_CIBuild"
-
-    val preReleaseBuildId: String
-        get() = "${id}_PreReleaseBuild"
-
-    val releaseBuildId: String
-        get() = "${id}_ReleaseBuild"
-
-    val deploymentProjectId: String
-        get() = "${id}_DeploymentProject"
-}
-
-class JavascriptPackage(
-        val id:          String,
-        val packageName: String)
-
 
 fun configureJavascriptProject(solution: JavascriptProject) : Project{
-
-    val ciVcsRoot = GitVcsRoot({
-        uuid             = "${solution.guid}CIVcsRoot"
-        id               = solution.ciVcsRootId
-        name             = "${solution.codeGithubUrl}_CI"
-        url              = solution.codeGithubUrl
-        branch           = "%DefaultBranch%"
-        branchSpec       = "%BranchSpecification%"
-        agentCleanPolicy = GitVcsRoot.AgentCleanPolicy.ALWAYS
-        authMethod = uploadedKey {
-            uploadedKey = "provenstyle"
-        }
-    })
-
-    val preReleaseVcsRoot = GitVcsRoot({
-        uuid             = "${solution.guid}PreReleaseVcsRoot"
-        id               = solution.preReleaseVcsRootId
-        name             = "${solution.codeGithubUrl}_PreRelease"
-        url              = solution.codeGithubUrl
-        branch           = "%DefaultBranch%"
-        branchSpec       = "%BranchSpecification%"
-        agentCleanPolicy = GitVcsRoot.AgentCleanPolicy.ALWAYS
-        authMethod = uploadedKey {
-            uploadedKey = "provenstyle"
-        }
-    })
-
-    val releaseVcsRoot = GitVcsRoot({
-        uuid             = "${solution.guid}ReleaseVcsRoot"
-        id               = solution.releaseVcsRootId
-        name             = "${solution.codeGithubUrl}_Release"
-        url              = solution.codeGithubUrl
-        branch           = "%DefaultBranch%"
-        branchSpec       = "%BranchSpecification%"
-        agentCleanPolicy = GitVcsRoot.AgentCleanPolicy.ALWAYS
-        authMethod = uploadedKey {
-            uploadedKey = "provenstyle"
-        }
-    })
-
-
 
     fun javascriptBuild(buildType: BuildType) : BuildType{
         build(test(jspmInstall(yarnInstall(setPackageVersion(gitShortHash(buildType))))))
@@ -115,7 +32,7 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
         }
 
         vcs {
-            root(ciVcsRoot)
+            root(ciVcsRoot(solution))
             cleanCheckout = true
         }
 
@@ -145,7 +62,7 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
         }
 
         vcs {
-            root(preReleaseVcsRoot)
+            root(preReleaseVcsRoot(solution))
             cleanCheckout = true
         }
     }))
@@ -165,7 +82,7 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
         }
 
         vcs {
-            root(releaseVcsRoot)
+            root(releaseVcsRoot(solution))
             cleanCheckout = true
             checkoutMode = CheckoutMode.ON_AGENT
         }
@@ -193,9 +110,9 @@ fun configureJavascriptProject(solution: JavascriptProject) : Project{
         name        = solution.name
         description = "CI/CD"
 
-        vcsRoot(ciVcsRoot)
-        vcsRoot(preReleaseVcsRoot)
-        vcsRoot(releaseVcsRoot)
+        vcsRoot(ciVcsRoot(solution))
+        vcsRoot(preReleaseVcsRoot(solution))
+        vcsRoot(releaseVcsRoot(solution))
 
         buildType(ciBuild)
         buildType(preReleaseBuild)
@@ -232,42 +149,6 @@ fun configurePackageDeployProject(
 
     val baseUuid = "${javascriptProject.guid}_${javascriptPackage.id}"
     val baseId   = "${javascriptProject.id}_${javascriptPackage.id}"
-
-    fun packPackage(buildType: BuildType) : BuildType{
-
-        buildType.steps {
-            script {
-                name          = "Pack"
-                scriptContent = "%npm% pack"
-            }
-        }
-
-        return buildType
-    }
-
-    fun deployPreReleasePackage(buildType: BuildType) : BuildType{
-
-        buildType.steps {
-            script {
-                name          = "Publish PreRelease"
-                scriptContent = "%npm% publish %PackageName%-%PackageVersion%.tgz --tag prerelease"
-            }
-        }
-
-        return buildType
-    }
-
-    fun deployReleasePackage(buildType: BuildType) : BuildType{
-
-        buildType.steps {
-            script {
-                name          = "Publish Release"
-                scriptContent = "%npm% publish %PackageName%-%PackageVersion%.tgz --tag latest"
-            }
-        }
-
-        return buildType
-    }
 
     val deployPreRelease =  deployPreReleasePackage(packPackage(BuildType({
         uuid               = "${baseUuid}_DeployPreRelease"
@@ -351,7 +232,7 @@ fun configurePackageDeployProject(
         buildType(deployRelease)
 
         params {
-            param("PackageName",        javascriptPackage.packageName)
+            param("PackageName", javascriptPackage.packageName)
         }
     })
 }

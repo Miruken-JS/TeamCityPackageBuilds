@@ -46,6 +46,26 @@ fun build(buildType: BuildType) : BuildType{
     return buildType
 }
 
+fun gruntMinify(buildType: BuildType) : BuildType{
+    buildType.steps {
+        script {
+            name          = "Grunt Minify"
+            scriptContent = "%grunt% minify"
+        }
+    }
+    return buildType
+}
+
+fun gruntTest(buildType: BuildType) : BuildType{
+    buildType.steps {
+        script {
+            name          = "Grunt Test"
+            scriptContent = "%grunt% test"
+        }
+    }
+    return buildType
+}
+
 fun gitShortHash(buildType: BuildType) : BuildType{
     buildType.steps {
         powerShell {
@@ -178,6 +198,42 @@ fun tagBuild(buildType: BuildType) : BuildType{
                 """.trimIndent()
             }
             noProfile = false
+        }
+    }
+
+    return buildType
+}
+
+fun packPackage(buildType: BuildType) : BuildType{
+
+    buildType.steps {
+        script {
+            name          = "Pack"
+            scriptContent = "%npm% pack"
+        }
+    }
+
+    return buildType
+}
+
+fun deployPreReleasePackage(buildType: BuildType) : BuildType{
+
+    buildType.steps {
+        script {
+            name          = "Publish PreRelease"
+            scriptContent = "%npm% publish %PackageName%-%PackageVersion%.tgz --tag prerelease"
+        }
+    }
+
+    return buildType
+}
+
+fun deployReleasePackage(buildType: BuildType) : BuildType{
+
+    buildType.steps {
+        script {
+            name          = "Publish Release"
+            scriptContent = "%npm% publish %PackageName%-%PackageVersion%.tgz --tag latest"
         }
     }
 
