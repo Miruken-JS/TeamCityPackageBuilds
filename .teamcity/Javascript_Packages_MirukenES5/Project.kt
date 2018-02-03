@@ -7,7 +7,7 @@ import jetbrains.buildServer.configs.kotlin.v2017_2.Project
 
 object Project : Project({
     uuid     = "6469cc81-0845-45da-b3fb-18a429b2123a"
-    id       = "Javascript_Packages_MirukenEs5"
+    id       = "Javascript_Packages_MirukenES5"
     parentId = "Javascript_Packages"
     name     = "Miruken-ES5"
 

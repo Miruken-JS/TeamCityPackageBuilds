@@ -32,4 +32,4 @@ the 'Debug' option is available in the context menu for the task.
 */
 
 version = "2017.2"
-project(Javascript_Packages.Project)
+project(Javascript_Packages_MirukenJS.Project)
