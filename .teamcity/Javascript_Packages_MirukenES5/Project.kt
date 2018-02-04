@@ -2,7 +2,7 @@ package Javascript_Packages_MirukenES5
 
 import BuildTemplates.JavascriptPackage
 import BuildTemplates.JavascriptProject
-import BuildTemplates.configureJavascriptProject
+import BuildTemplates.configureEs5Project
 import jetbrains.buildServer.configs.kotlin.v2017_2.Project
 
 object Project : Project({
@@ -11,7 +11,7 @@ object Project : Project({
     parentId = "Javascript_Packages"
     name     = "Miruken-ES5"
 
-    subProject(configureJavascriptProject(JavascriptProject(
+    subProject(configureEs5Project(JavascriptProject(
             guid              = "2992abf2-e74a-44e6-950a-30f41d7bfff5",
             parentId          = "Javascript_MirukenEs5",
             id                = "Javascript_MirukenEs5_Mirken",

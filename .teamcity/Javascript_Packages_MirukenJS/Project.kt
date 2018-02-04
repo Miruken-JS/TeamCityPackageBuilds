@@ -2,7 +2,7 @@ package Javascript_Packages_MirukenJS
 
 import BuildTemplates.JavascriptPackage
 import BuildTemplates.JavascriptProject
-import BuildTemplates.configureJavascriptProject
+import BuildTemplates.configureJsProject
 import jetbrains.buildServer.configs.kotlin.v2017_2.Project
 
 object Project : Project({
@@ -11,7 +11,7 @@ object Project : Project({
     parentId = "Javascript_Packages"
     name     = "Miruken-JS"
 
-    subProject(configureJavascriptProject(JavascriptProject(
+    subProject(configureJsProject(JavascriptProject(
             guid              = "983f8966-9172-49d6-89b2-4ca5acbe22f8",
             parentId          = "Javascript_Packages_MirukenJS",
             id                = "Javascript_Packages_MirukenJs_Core",
@@ -26,7 +26,7 @@ object Project : Project({
                             packageName = "miruken-core"
                     )))))
 
-    subProject(configureJavascriptProject(JavascriptProject(
+    subProject(configureJsProject(JavascriptProject(
             guid              = "c5fd1e3a-3ee5-4adb-9695-b4fc50557247",
             parentId          = "Javascript_Packages_MirukenJS",
             id                = "Javascript_Packages_MirukenJs_Callback",

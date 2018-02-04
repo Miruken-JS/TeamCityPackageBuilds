@@ -7,7 +7,7 @@ import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2017_2.*
 import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.finishBuildTrigger
 
-fun configureJavascriptProject(solution: JavascriptProject) : Project{
+fun configureJsProject(solution: JavascriptProject) : Project{
 
     fun javascriptBuild(buildType: BuildType) : BuildType{
         build(test(jspmInstall(yarnInstall(setPackageVersion(gitShortHash(buildType))))))
