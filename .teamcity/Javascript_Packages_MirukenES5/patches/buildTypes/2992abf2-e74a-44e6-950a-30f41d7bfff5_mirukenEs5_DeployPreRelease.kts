@@ -10,6 +10,17 @@ accordingly and delete the patch script.
 */
 changeBuildType("2992abf2-e74a-44e6-950a-30f41d7bfff5_mirukenEs5_DeployPreRelease") {
     vcs {
+
+        check(checkoutMode == CheckoutMode.AUTO) {
+            "Unexpected option value: checkoutMode = $checkoutMode"
+        }
+        checkoutMode = CheckoutMode.ON_AGENT
+
+        check(cleanCheckout == false) {
+            "Unexpected option value: cleanCheckout = $cleanCheckout"
+        }
+        cleanCheckout = true
+
         add("Javascript_MirukenEs5_Mirken_mirukenEs5_MirukenEs5")
     }
 }
