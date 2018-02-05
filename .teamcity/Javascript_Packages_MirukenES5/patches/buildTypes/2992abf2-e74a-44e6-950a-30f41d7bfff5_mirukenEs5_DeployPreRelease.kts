@@ -9,6 +9,11 @@ To apply the patch, change the buildType with uuid = '2992abf2-e74a-44e6-950a-30
 accordingly and delete the patch script.
 */
 changeBuildType("2992abf2-e74a-44e6-950a-30f41d7bfff5_mirukenEs5_DeployPreRelease") {
+    check(paused == false) {
+        "Unexpected paused: '$paused'"
+    }
+    paused = true
+
     vcs {
 
         check(checkoutMode == CheckoutMode.AUTO) {
