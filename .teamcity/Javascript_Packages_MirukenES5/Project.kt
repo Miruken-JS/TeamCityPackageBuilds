@@ -29,16 +29,16 @@ object Project : Project({
                             Build.zip!/dist/miruken-bundle.js     => miruken-bundle.js
                             Build.zip!/dist/miruken-bundle.min.js => miruken-bundle.min.js
                         """.trimIndent()
-                    ),
-                    Es5JavascriptPackage(
-                        id               = "mirukenEs5Angular",
-                        packageName      = "miruken-es5-angular",
-                        packageGithubUrl = "git@github.com:Miruken-ES5/miruken-es5-angular.git",
-                        artifactsOut = """
-                            Build.zip!/dist/miruken-ng-bundle.js     => miruken-ng-bundle.js
-                            Build.zip!/dist/miruken-ng-bundle.min.js => miruken-ng-bundle.min.js
-                        """.trimIndent()
                     )
+//                    Es5JavascriptPackage(
+//                        id               = "mirukenEs5Angular",
+//                        packageName      = "miruken-es5-angular",
+//                        packageGithubUrl = "git@github.com:Miruken-ES5/miruken-es5-angular.git",
+//                        artifactsOut = """
+//                            Build.zip!/dist/miruken-ng-bundle.js     => miruken-ng-bundle.js
+//                            Build.zip!/dist/miruken-ng-bundle.min.js => miruken-ng-bundle.min.js
+//                        """.trimIndent()
+//                    )
             )))
 
 })
