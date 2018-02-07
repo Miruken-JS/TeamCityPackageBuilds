@@ -10,7 +10,7 @@ import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.finishBuildTrigger
 fun configureEs5Project(solution: JavascriptProject) : Project{
 
     fun javascriptBuild(buildType: BuildType) : BuildType{
-        gruntMinify(gruntTest((yarnInstall(setPackageVersion(gitShortHash(buildType))))))
+        gruntCI((yarnInstall(setPackageVersion(gitShortHash(buildType)))))
 
         buildType.buildNumberPattern = "%BuildFormatSpecification%"
 

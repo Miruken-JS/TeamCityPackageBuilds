@@ -46,21 +46,11 @@ fun build(buildType: BuildType) : BuildType{
     return buildType
 }
 
-fun gruntMinify(buildType: BuildType) : BuildType{
+fun gruntCI(buildType: BuildType) : BuildType{
     buildType.steps {
         script {
-            name          = "Grunt Minify"
-            scriptContent = "%grunt% minify"
-        }
-    }
-    return buildType
-}
-
-fun gruntTest(buildType: BuildType) : BuildType{
-    buildType.steps {
-        script {
-            name          = "Grunt Test"
-            scriptContent = "%grunt% test"
+            name          = "Grunt CI"
+            scriptContent = "%grunt% ci"
         }
     }
     return buildType
