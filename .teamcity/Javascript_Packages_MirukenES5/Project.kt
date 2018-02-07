@@ -1,6 +1,6 @@
 package Javascript_Packages_MirukenES5
 
-import BuildTemplates.JavascriptPackage
+import BuildTemplates.Es5JavascriptPackage
 import BuildTemplates.JavascriptProject
 import BuildTemplates.configureEs5Project
 import jetbrains.buildServer.configs.kotlin.v2017_2.Project
@@ -19,16 +19,26 @@ object Project : Project({
             codeGithubUrl     = "git@github.com:Miruken-ES5/miruken.git",
             majorVersion      = "2",
             minorVersion      = "0",
-            patchVersion      = "24",
-            javascriptPackages = listOf(
-                    JavascriptPackage(
-                        id          = "mirukenEs5",
-                        packageName = "miruken-es5"
+            patchVersion      = "24"),
+            listOf(
+                    Es5JavascriptPackage(
+                        id               = "mirukenEs5",
+                        packageName      = "miruken-es5",
+                        packageGithubUrl = "git@github.com:Miruken-ES5/miruken-es5.git",
+                        artifactsOut = """
+                            Build.zip!/dist/miruken-bundle.js     => miruken-bundle.js
+                            Build.zip!/dist/miruken-bundle.min.js => miruken-bundle.min.js
+                        """.trimIndent()
                     ),
-                    JavascriptPackage(
-                        id          = "mirukenEs5Angular",
-                        packageName = "miruken-es5-angular"
+                    Es5JavascriptPackage(
+                        id               = "mirukenEs5Angular",
+                        packageName      = "miruken-es5-angular",
+                        packageGithubUrl = "git@github.com:Miruken-ES5/miruken-es5-angular.git",
+                        artifactsOut = """
+                            Build.zip!/dist/miruken-ng-bundle.js     => miruken-ng-bundle.js
+                            Build.zip!/dist/miruken-ng-bundle.min.js => miruken-ng-bundle.min.js
+                        """.trimIndent()
                     )
-            ))))
+            )))
 
 })

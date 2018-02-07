@@ -6,8 +6,9 @@ import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.VcsTrigger
 import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2017_2.*
 import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.finishBuildTrigger
+import jetbrains.buildServer.configs.kotlin.v2017_2.vcs.GitVcsRoot
 
-fun configureEs5Project(solution: JavascriptProject) : Project{
+fun configureEs5Project(solution: JavascriptProject, packages: List<Es5JavascriptPackage>) : Project{
 
     fun javascriptBuild(buildType: BuildType) : BuildType{
         gruntCI((yarnInstall(setPackageVersion(gitShortHash(buildType)))))
@@ -104,8 +105,8 @@ fun configureEs5Project(solution: JavascriptProject) : Project{
             param("SHA", "")
         }
 
-        for(javascriptPackage in solution.javascriptPackages){
-            subProject(configurePackageDeployProject(solution, javascriptPackage, preReleaseBuild, releaseBuild))
+        for(javascriptPackage in packages){
+            subProject(configureEs5PackageDeployProject(solution, javascriptPackage, preReleaseBuild, releaseBuild))
         }
     })
 
@@ -149,14 +150,34 @@ fun configureEs5Project(solution: JavascriptProject) : Project{
 
 fun configureEs5PackageDeployProject(
         javascriptProject: JavascriptProject,
-        javascriptPackage: JavascriptPackage,
+        javascriptPackage: Es5JavascriptPackage,
         preReleaseBuild: BuildType,
         releaseBuild: BuildType) : Project{
 
     val baseUuid = "${javascriptProject.guid}_${javascriptPackage.id}"
     val baseId   = "${javascriptProject.id}_${javascriptPackage.id}"
 
-    val deployPreRelease =  deployPreReleasePackage(packPackage(BuildType({
+    fun packageVcsRoot(releaseType: String, buildType: BuildType) : BuildType{
+        buildType.vcs{
+            GitVcsRoot({
+                uuid             = "${javascriptProject.guid}${releaseType}VcsRoot"
+                id               = "${javascriptPackage.id}${releaseType}VcsRoot"
+                name             = "${javascriptPackage.packageGithubUrl}${releaseType}VcsRoot"
+
+                url              = javascriptPackage.packageGithubUrl
+                branch           = "%DefaultBranch%"
+                branchSpec       = "%BranchSpecification%"
+                agentCleanPolicy = GitVcsRoot.AgentCleanPolicy.ALWAYS
+                authMethod = uploadedKey {
+                    uploadedKey = "provenstyle"
+                }
+            })
+        }
+        return buildType
+    }
+
+    val deployPreRelease =  deployPreReleasePackage(packPackage(packageVcsRoot("preRelease", BuildType({
+
         uuid               = "${baseUuid}_DeployPreRelease"
         id                 = "${baseId}_DeployPreRelease"
         name               = "Deploy PreRelease"
@@ -189,9 +210,9 @@ fun configureEs5PackageDeployProject(
                 }
             }
         }
-    })))
+    }))))
 
-    val deployRelease = deployReleasePackage(packPackage(BuildType({
+    val deployRelease = deployReleasePackage(packPackage(packageVcsRoot("release", BuildType({
         uuid         = "${baseUuid}_DeployRelease"
         id           = "${baseId}_DeployRelease"
         name         = "Deploy Release"
@@ -225,7 +246,7 @@ fun configureEs5PackageDeployProject(
                 }
             }
         }
-    })))
+    }))))
 
     return Project({
         uuid        = baseUuid
@@ -238,7 +259,8 @@ fun configureEs5PackageDeployProject(
         buildType(deployRelease)
 
         params {
-            param("PackageName", javascriptPackage.packageName)
+            param("PackageName",  javascriptPackage.packageName)
+            param("ArtifactsOut", javascriptPackage.artifactsOut)
         }
     })
 }

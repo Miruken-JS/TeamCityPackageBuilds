@@ -7,7 +7,7 @@ import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2017_2.*
 import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.finishBuildTrigger
 
-fun configureJsProject(solution: JavascriptProject) : Project{
+fun configureJsProject(solution: JavascriptProject, packages: List<JavascriptPackage>) : Project{
 
     fun javascriptBuild(buildType: BuildType) : BuildType{
         build(test(jspmInstall(yarnInstall(setPackageVersion(gitShortHash(buildType))))))
@@ -104,7 +104,7 @@ fun configureJsProject(solution: JavascriptProject) : Project{
             param("SHA", "")
         }
 
-        for(javascriptPackage in solution.javascriptPackages){
+        for(javascriptPackage in packages){
             subProject(configurePackageDeployProject(solution, javascriptPackage, preReleaseBuild, releaseBuild))
         }
     })

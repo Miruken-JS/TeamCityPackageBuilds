@@ -8,8 +8,7 @@ class JavascriptProject(
         val codeGithubUrl:  String,
         val majorVersion:   String,
         val minorVersion:   String,
-        val patchVersion:   String,
-        val javascriptPackages:  List<JavascriptPackage>){
+        val patchVersion:   String) {
 
     val ciVcsRootId: String
         get() = "${id}_CIVCSRoot"
@@ -36,3 +35,11 @@ class JavascriptProject(
 class JavascriptPackage(
         val id:          String,
         val packageName: String)
+
+class Es5JavascriptPackage (
+        val id:               String,
+        val packageName:      String,
+        val packageGithubUrl: String,
+        val artifactsOut:     String)
+
+
