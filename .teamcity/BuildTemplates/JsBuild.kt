@@ -23,6 +23,8 @@ fun configureJsProject(solution: JavascriptProject) : Project{
         name        = "CI Build"
         description = "Watches git repo & creates a build for any change to any branch. Runs tests. Does NOT package/deploy packages!"
 
+        allowExternalStatus = true
+
         params {
             param("BranchSpecification", "+:refs/heads/(*)")
             param("MajorVersion",        "0")
@@ -54,6 +56,8 @@ fun configureJsProject(solution: JavascriptProject) : Project{
         description   = "This will push a prerelease package"
         artifactRules = "%ArtifactsIn%"
 
+        allowExternalStatus = true
+
         params {
             param("BranchSpecification", """
             +:refs/heads/(develop)
@@ -74,6 +78,8 @@ fun configureJsProject(solution: JavascriptProject) : Project{
         name          = "Release Build"
         description   = "This will push a release package from the MASTER branch."
         artifactRules = "%ArtifactsIn%"
+
+        allowExternalStatus = true
 
         params {
             param("BranchSpecification",              "+:refs/heads/(master)")
