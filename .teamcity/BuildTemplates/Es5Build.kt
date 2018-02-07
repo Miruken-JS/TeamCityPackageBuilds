@@ -158,21 +158,21 @@ fun configureEs5PackageDeployProject(
     val baseId   = "${javascriptProject.id}_${javascriptPackage.id}"
 
     fun packageVcsRoot(releaseType: String, buildType: BuildType) : BuildType{
-        buildType.vcs{
-            GitVcsRoot({
-                uuid             = "${javascriptProject.guid}${releaseType}VcsRoot"
-                id               = "${javascriptPackage.id}${releaseType}VcsRoot"
-                name             = "${javascriptPackage.packageGithubUrl}${releaseType}VcsRoot"
-
-                url              = javascriptPackage.packageGithubUrl
-                branch           = "%DefaultBranch%"
-                branchSpec       = "%BranchSpecification%"
-                agentCleanPolicy = GitVcsRoot.AgentCleanPolicy.ALWAYS
-                authMethod = uploadedKey {
-                    uploadedKey = "provenstyle"
-                }
-            })
-        }
+//        buildType.vcs{
+//            GitVcsRoot({
+//                uuid             = "${javascriptProject.guid}${releaseType}VcsRoot"
+//                id               = "${javascriptPackage.id}${releaseType}VcsRoot"
+//                name             = "${javascriptPackage.packageGithubUrl}${releaseType}VcsRoot"
+//
+//                url              = javascriptPackage.packageGithubUrl
+//                branch           = "%DefaultBranch%"
+//                branchSpec       = "%BranchSpecification%"
+//                agentCleanPolicy = GitVcsRoot.AgentCleanPolicy.ALWAYS
+//                authMethod = uploadedKey {
+//                    uploadedKey = "provenstyle"
+//                }
+//            })
+//        }
         return buildType
     }
 
