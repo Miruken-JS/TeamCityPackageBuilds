@@ -26,8 +26,8 @@ object Project : Project({
                         packageName      = "miruken-es5",
                         packageGithubUrl = "git@github.com:Miruken-ES5/miruken-es5.git",
                         artifactsOut = """
-                            Build.zip!/dist/miruken-bundle.js     => miruken-bundle.js
-                            Build.zip!/dist/miruken-bundle.min.js => miruken-bundle.min.js
+                            Build.zip!/dist/miruken-bundle.js
+                            Build.zip!/dist/miruken-bundle.min.js
                         """.trimIndent()
                     )
 //                    Es5JavascriptPackage(

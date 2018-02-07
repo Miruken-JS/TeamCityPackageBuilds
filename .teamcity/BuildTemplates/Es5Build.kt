@@ -176,7 +176,7 @@ fun configureEs5PackageDeployProject(
         return buildType
     }
 
-    val deployPreRelease =  deployPreReleasePackage(packPackage(packageVcsRoot("preRelease", BuildType({
+    val deployPreRelease =  packPackage(packageVcsRoot("preRelease", (setPackageVersion(BuildType({
 
         uuid               = "${baseUuid}_DeployPreRelease"
         id                 = "${baseId}_DeployPreRelease"
@@ -210,7 +210,7 @@ fun configureEs5PackageDeployProject(
                 }
             }
         }
-    }))))
+    })))))
 
     val deployRelease = deployReleasePackage(packPackage(packageVcsRoot("release", BuildType({
         uuid         = "${baseUuid}_DeployRelease"
