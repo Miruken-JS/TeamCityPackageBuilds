@@ -167,6 +167,32 @@ fun incrementProjectPatchVersion(buildType: BuildType) : BuildType{
     return buildType
 }
 
+fun commitPackageArtifactsToGit(unminified: String, minified: String, buildType: BuildType) : BuildType{
+    buildType.steps {
+        powerShell {
+            name       = "Commit Package Artifacts To Git"
+            id         = "${buildType.id}_CommitToGit"
+            platform   = PowerShellStep.Platform.x86
+            edition    = PowerShellStep.Edition.Desktop
+            scriptMode = script {
+                content = """
+                    ${'$'}branch = "%teamcity.build.branch%"
+
+                    if(${'$'}branch -ne "master") { return 0 }
+
+                    git add package.json
+                    git add $minified
+                    git add $unminified
+                    git commit -m "Package artifacts from ci cd"
+                """.trimIndent()
+            }
+            noProfile = false
+        }
+    }
+
+    return buildType
+}
+
 fun tagBuild(buildType: BuildType) : BuildType{
     buildType.steps {
         powerShell {

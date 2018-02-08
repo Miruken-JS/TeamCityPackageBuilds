@@ -158,7 +158,10 @@ fun configureEs5PackageDeployProject(
     val baseUuid = "${javascriptProject.guid}_${javascriptPackage.id}"
     val baseId   = "${javascriptProject.id}_${javascriptPackage.id}"
 
-    val deployPreRelease =  packPackage(setPackageVersion(BuildType({
+    val deployPreRelease =
+        packPackage(
+        setPackageVersion(
+        BuildType({
 
         uuid               = "${baseUuid}_DeployPreRelease"
         id                 = "${baseId}_DeployPreRelease"
@@ -176,7 +179,7 @@ fun configureEs5PackageDeployProject(
             cleanCheckout = true
             checkoutMode  = CheckoutMode.ON_AGENT
         }
-        
+
         triggers {
             finishBuildTrigger {
                 id = "${baseId}_DeployPreRelease_TRIGGER"
@@ -193,14 +196,20 @@ fun configureEs5PackageDeployProject(
 
                 artifacts {
                     id               = "${baseId}_PreRelease_ARTIFACT_DEPENDENCY"
-                    cleanDestination = true
+                    cleanDestination = false
                     artifactRules    = "%ArtifactsOut%"
                 }
             }
         }
     })))
 
-    val deployRelease = deployReleasePackage(packPackage(BuildType({
+    val deployRelease =
+        tagBuild(
+        commitPackageArtifactsToGit(javascriptPackage.unminifiedFile, javascriptPackage.minifiedFile,
+        deployReleasePackage(
+        packPackage(
+        BuildType({
+
         uuid         = "${baseUuid}_DeployRelease"
         id           = "${baseId}_DeployRelease"
         name         = "Deploy Release"
@@ -235,12 +244,12 @@ fun configureEs5PackageDeployProject(
 
                 artifacts {
                     id               = "${baseId}_Release_ARTIFACT_DEPENDENCY"
-                    cleanDestination = true
+                    cleanDestination = false
                     artifactRules    = "%ArtifactsOut%"
                 }
             }
         }
-    })))
+    })))))
 
     return Project({
         uuid        = baseUuid

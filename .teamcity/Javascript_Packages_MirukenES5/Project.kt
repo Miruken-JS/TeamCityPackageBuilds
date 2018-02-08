@@ -29,7 +29,9 @@ object Project : Project({
                         artifactsOut = """
                             Build.zip!/dist/miruken-bundle.js
                             Build.zip!/dist/miruken-bundle.min.js
-                        """.trimIndent()
+                        """.trimIndent(),
+                        unminifiedFile = "miruken-bundle.js",
+                        minifiedFile   = "miruken-bundle.min.js"
                     )
 //                    Es5JavascriptPackage(
 //                        id               = "mirukenEs5Angular",
