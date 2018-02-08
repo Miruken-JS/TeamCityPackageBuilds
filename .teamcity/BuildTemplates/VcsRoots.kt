@@ -51,7 +51,7 @@ fun packageVcsRoot (javascriptPackage: Es5JavascriptPackage): GitVcsRoot {
     return GitVcsRoot({
         uuid             = javascriptPackage.packageVcsRootUuid
         id               = javascriptPackage.packageVcsRootId
-        name             = "${javascriptPackage.packageName} VcsRoot"
+        name             = "${javascriptPackage.packageGithubUrl}_Package"
         url              = javascriptPackage.packageGithubUrl
         branch           = "master"
         agentCleanPolicy = GitVcsRoot.AgentCleanPolicy.ALWAYS
