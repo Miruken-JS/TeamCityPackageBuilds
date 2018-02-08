@@ -22,6 +22,7 @@ object Project : Project({
             patchVersion      = "24"),
             listOf(
                     Es5JavascriptPackage(
+                        uuid             = "2946284d-8d74-4e4b-9c7a-cc5cad66a469",
                         id               = "mirukenEs5",
                         packageName      = "miruken-es5",
                         packageGithubUrl = "git@github.com:Miruken-ES5/miruken-es5.git",

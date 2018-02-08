@@ -37,6 +37,7 @@ class JavascriptPackage(
         val packageName: String)
 
 class Es5JavascriptPackage (
+        val uuid:             String,
         val id:               String,
         val packageName:      String,
         val packageGithubUrl: String,
@@ -44,6 +45,9 @@ class Es5JavascriptPackage (
 
     val packageVcsRootId: String
         get() = "${id}_PackageVCSRoot"
+
+    val packageVcsRootUuid: String
+        get() = "${uuid}_PackageVCSRoot"
 }
 
 

@@ -208,8 +208,8 @@ fun configureEs5PackageDeployProject(
             param("PrereleaseVersion",        "")
         }
 
-        vcs{
-            add(javascriptPackage.packageVcsRootId)
+        vcs {
+            root(packageVcsRoot(javascriptPackage))
             cleanCheckout = true
             checkoutMode  = CheckoutMode.ON_AGENT
         }
@@ -243,19 +243,7 @@ fun configureEs5PackageDeployProject(
         name        = javascriptPackage.packageName
         description = "${javascriptPackage.packageName} npm package"
 
-        vcsRoot{
-            GitVcsRoot({
-                uuid             = "${javascriptProject.guid}${javascriptPackage.packageName}_packageVcsRoot"
-                id               = javascriptPackage.packageVcsRootId
-                name             = "${javascriptPackage.packageName} VcsRoot"
-                url              = javascriptPackage.packageGithubUrl
-                branch           = "master"
-                agentCleanPolicy = GitVcsRoot.AgentCleanPolicy.ALWAYS
-                authMethod = uploadedKey {
-                    uploadedKey = "provenstyle"
-                }
-            })
-        }
+        vcsRoot(packageVcsRoot(javascriptPackage))
 
         buildType(deployPreRelease)
         buildType(deployRelease)

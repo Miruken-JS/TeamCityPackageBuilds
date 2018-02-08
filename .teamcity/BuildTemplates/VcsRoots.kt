@@ -46,3 +46,17 @@ fun releaseVcsRoot (javascriptProject: JavascriptProject): GitVcsRoot {
         }
     })
 }
+
+fun packageVcsRoot (javascriptPackage: Es5JavascriptPackage): GitVcsRoot {
+    return GitVcsRoot({
+        uuid             = javascriptPackage.packageVcsRootUuid
+        id               = javascriptPackage.packageVcsRootId
+        name             = "${javascriptPackage.packageName} VcsRoot"
+        url              = javascriptPackage.packageGithubUrl
+        branch           = "master"
+        agentCleanPolicy = GitVcsRoot.AgentCleanPolicy.ALWAYS
+        authMethod = uploadedKey {
+            uploadedKey = "provenstyle"
+        }
+    })
+}
