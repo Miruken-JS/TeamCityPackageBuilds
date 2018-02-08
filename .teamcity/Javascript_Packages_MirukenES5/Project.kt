@@ -26,12 +26,12 @@ object Project : Project({
                         id               = "mirukenEs5",
                         packageName      = "miruken-es5",
                         packageGithubUrl = "git@github.com:Miruken-ES5/miruken-es5.git",
+                        unminifiedFile   = "miruken-bundle.js",
+                        minifiedFile     = "miruken-bundle.min.js",
                         artifactsOut = """
                             Build.zip!/dist/miruken-bundle.js
                             Build.zip!/dist/miruken-bundle.min.js
-                        """.trimIndent(),
-                        unminifiedFile = "miruken-bundle.js",
-                        minifiedFile   = "miruken-bundle.min.js"
+                        """.trimIndent()
                     )
 //                    Es5JavascriptPackage(
 //                        id               = "mirukenEs5Angular",

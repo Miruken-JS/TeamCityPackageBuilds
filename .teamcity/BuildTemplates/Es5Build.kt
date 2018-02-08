@@ -159,6 +159,7 @@ fun configureEs5PackageDeployProject(
     val baseId   = "${javascriptProject.id}_${javascriptPackage.id}"
 
     val deployPreRelease =
+        deployPreReleasePackage(
         packPackage(
         setPackageVersion(
         BuildType({
@@ -201,13 +202,14 @@ fun configureEs5PackageDeployProject(
                 }
             }
         }
-    })))
+    }))))
 
     val deployRelease =
         tagBuild(
         commitPackageArtifactsToGit(javascriptPackage.unminifiedFile, javascriptPackage.minifiedFile,
         deployReleasePackage(
         packPackage(
+        setPackageVersion(
         BuildType({
 
         uuid         = "${baseUuid}_DeployRelease"
@@ -249,7 +251,7 @@ fun configureEs5PackageDeployProject(
                 }
             }
         }
-    })))))
+    }))))))
 
     return Project({
         uuid        = baseUuid
