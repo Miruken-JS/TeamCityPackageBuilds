@@ -101,7 +101,7 @@ fun setMirukenVersion(buildType: BuildType) : BuildType{
                             }
 
                             ${'$'}package = Get-Content "$fileName" -Raw
-                            ${'$'}updated = ${'$'}package -replace 'version\s*:\s*"(.*)"', version: ""${'$'}version$TQ
+                            ${'$'}updated = ${'$'}package -replace 'version\s*:\s*"(.*)"', "version: ""${'$'}version$TQ
                             ${'$'}updated | Set-Content '$fileName'
 
                             Write-Host "Updated $fileName to version ${'$'}version"
