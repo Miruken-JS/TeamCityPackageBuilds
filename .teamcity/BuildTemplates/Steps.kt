@@ -89,7 +89,7 @@ fun setMirukenVersion(buildType: BuildType) : BuildType{
     val fileName = "./lib/miruken.js"
     buildType.steps {
         powerShell {
-            name                = "Set Package Version"
+            name                = "Set Miruken Version"
             formatStderrAsError = true
             scriptMode = script {
                 content = """
@@ -120,7 +120,7 @@ fun setMirukenVersion(buildType: BuildType) : BuildType{
 fun setPackageVersion(fileName: String, buildType: BuildType) : BuildType{
     buildType.steps {
         powerShell {
-            name                = "Set Package Version"
+            name                = "Set Version In $fileName"
             formatStderrAsError = true
             scriptMode = script {
                 content = """
