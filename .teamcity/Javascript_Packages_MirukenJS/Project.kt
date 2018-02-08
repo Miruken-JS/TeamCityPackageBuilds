@@ -19,7 +19,7 @@ object Project : Project({
             codeGithubUrl     = "git@github.com:Miruken-JS/core.git",
             majorVersion      = "0",
             minorVersion      = "0",
-            patchVersion      = "4") ,
+            patchVersion      = "4"),
             listOf(
                 JavascriptPackage(
                         id          = "mirukenCore",

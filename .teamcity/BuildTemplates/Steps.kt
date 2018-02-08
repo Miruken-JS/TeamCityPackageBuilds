@@ -5,7 +5,6 @@ import jetbrains.buildServer.configs.kotlin.v2017_2.TQ
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.PowerShellStep
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.script
-import jetbrains.buildServer.configs.kotlin.v2017_2.version
 
 fun yarnInstall(buildType: BuildType) : BuildType{
     buildType.steps {

@@ -6,8 +6,6 @@ import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.VcsTrigger
 import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2017_2.*
 import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.finishBuildTrigger
-import jetbrains.buildServer.configs.kotlin.v2017_2.vcs.GitVcsRoot
-import jetbrains.buildServer.configs.kotlin.v2017_2.ui.*
 
 fun configureEs5Project(solution: JavascriptProject, packages: List<Es5JavascriptPackage>) : Project{
 
