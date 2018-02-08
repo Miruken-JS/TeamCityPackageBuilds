@@ -171,6 +171,12 @@ fun configureEs5PackageDeployProject(
             param("PackageVersion",           "%dep.${javascriptProject.preReleaseBuildId}.PackageVersion%")
         }
 
+        vcs {
+            root(packageVcsRoot(javascriptPackage))
+            cleanCheckout = true
+            checkoutMode  = CheckoutMode.ON_AGENT
+        }
+        
         triggers {
             finishBuildTrigger {
                 id = "${baseId}_DeployPreRelease_TRIGGER"
