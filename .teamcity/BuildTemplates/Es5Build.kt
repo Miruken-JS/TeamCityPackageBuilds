@@ -245,7 +245,7 @@ fun configureEs5PackageDeployProject(
 
         vcsRoot{
             GitVcsRoot({
-                uuid             = "${javascriptProject.guid}${javascriptPackage}_packageVcsRoot"
+                uuid             = "${javascriptProject.guid}${javascriptPackage.packageName}_packageVcsRoot"
                 id               = javascriptPackage.packageVcsRootId
                 name             = "${javascriptPackage.packageName} VcsRoot"
                 url              = javascriptPackage.packageGithubUrl
