@@ -74,7 +74,12 @@ fun configureEs5Project(solution: JavascriptProject, packages: List<Es5Javascrip
     }))
 
 
-    val releaseBuild = incrementProjectPatchVersion(tagBuild(javascriptBuild(BuildType({
+    val releaseBuild =
+            incrementProjectPatchVersion(
+            tagBuild("%SemanticVersion%",
+            javascriptBuild(
+            BuildType({
+
         uuid          = "${solution.guid}_ReleaseBuild"
         id            = solution.releaseBuildId
         name          = "Release Build"
@@ -205,7 +210,7 @@ fun configureEs5PackageDeployProject(
     }))))
 
     val deployRelease =
-        tagBuild(
+        tagBuild("%PackageVersion%",
         commitPackageArtifactsToGit(javascriptPackage.unminifiedFile, javascriptPackage.minifiedFile,
         deployReleasePackage(
         packPackage(

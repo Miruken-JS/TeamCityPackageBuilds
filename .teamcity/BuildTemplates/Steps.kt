@@ -5,6 +5,7 @@ import jetbrains.buildServer.configs.kotlin.v2017_2.TQ
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.PowerShellStep
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.script
+import jetbrains.buildServer.configs.kotlin.v2017_2.version
 
 fun yarnInstall(buildType: BuildType) : BuildType{
     buildType.steps {
@@ -193,7 +194,7 @@ fun commitPackageArtifactsToGit(unminified: String, minified: String, buildType:
     return buildType
 }
 
-fun tagBuild(buildType: BuildType) : BuildType{
+fun tagBuild(versionVariable: String, buildType: BuildType) : BuildType{
     buildType.steps {
         powerShell {
             name       = "Tag Build From Master Branch"
@@ -206,7 +207,7 @@ fun tagBuild(buildType: BuildType) : BuildType{
 
                     if(${'$'}branch -ne "master") { return 0 }
 
-                    ${'$'}tag = "%SemanticVersion%"
+                    ${'$'}tag = "$versionVariable"
                     Write-Host "Taging build ${'$'}tag"
 
                     git tag ${'$'}tag

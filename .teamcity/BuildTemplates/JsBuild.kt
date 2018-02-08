@@ -72,7 +72,12 @@ fun configureJsProject(solution: JavascriptProject, packages: List<JavascriptPac
     }))
 
 
-    val releaseBuild = incrementProjectPatchVersion(tagBuild(javascriptBuild(BuildType({
+    val releaseBuild =
+        incrementProjectPatchVersion(
+        tagBuild("%SemanticVersion%",
+        javascriptBuild(
+        BuildType({
+
         uuid          = "${solution.guid}_ReleaseBuild"
         id            = solution.releaseBuildId
         name          = "Release Build"
