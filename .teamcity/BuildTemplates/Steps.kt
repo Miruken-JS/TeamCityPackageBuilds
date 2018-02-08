@@ -85,7 +85,8 @@ fun gitShortHash(buildType: BuildType) : BuildType{
     return buildType
 }
 
-fun setPackageVersion(buildType: BuildType) : BuildType{
+fun setMirukenVersion(buildType: BuildType) : BuildType{
+    val fileName = "./lib/miruken.js"
     buildType.steps {
         powerShell {
             name                = "Set Package Version"
@@ -99,11 +100,42 @@ fun setPackageVersion(buildType: BuildType) : BuildType{
                                 throw "version is empty"
                             }
 
-                            ${'$'}package = Get-Content "package.json" -Raw
-                            ${'$'}updated = ${'$'}package -replace '"(version)"\s*:\s*"(.*)"', ${TQ}version"": ""${'$'}version$TQ
-                            ${'$'}updated | Set-Content 'package.json'
+                            ${'$'}package = Get-Content "$fileName" -Raw
+                            ${'$'}updated = ${'$'}package -replace 'version\s*:\s*"(.*)"', version: ""${'$'}version$TQ
+                            ${'$'}updated | Set-Content '$fileName'
 
-                            Write-Host "Updated package.json to version ${'$'}version"
+                            Write-Host "Updated $fileName to version ${'$'}version"
+                        } catch {
+                            return 1
+                        }
+                        return 0
+                    """.trimIndent()
+            }
+            param("jetbrains_powershell_scriptArguments", "%PackageVersion%")
+        }
+    }
+    return buildType
+}
+
+fun setPackageVersion(fileName: String, buildType: BuildType) : BuildType{
+    buildType.steps {
+        powerShell {
+            name                = "Set Package Version"
+            formatStderrAsError = true
+            scriptMode = script {
+                content = """
+                        try {
+                            ${'$'}version = ${'$'}args[0]
+
+                            if(!${'$'}version){
+                                throw "version is empty"
+                            }
+
+                            ${'$'}package = Get-Content "$fileName" -Raw
+                            ${'$'}updated = ${'$'}package -replace '"(version)"\s*:\s*"(.*)"', ${TQ}version"": ""${'$'}version$TQ
+                            ${'$'}updated | Set-Content '$fileName'
+
+                            Write-Host "Updated $fileName to version ${'$'}version"
                         } catch {
                             return 1
                         }

@@ -12,7 +12,10 @@ import jetbrains.buildServer.configs.kotlin.v2017_2.ui.*
 fun configureEs5Project(solution: JavascriptProject, packages: List<Es5JavascriptPackage>) : Project{
 
     fun javascriptBuild(buildType: BuildType) : BuildType{
-        gruntCI((yarnInstall(setPackageVersion(gitShortHash(buildType)))))
+        gruntCI(
+        yarnInstall(
+        setMirukenVersion(
+        gitShortHash(buildType))))
 
         buildType.buildNumberPattern = "%BuildFormatSpecification%"
 
@@ -163,10 +166,19 @@ fun configureEs5PackageDeployProject(
     val baseUuid = "${javascriptProject.guid}_${javascriptPackage.id}"
     val baseId   = "${javascriptProject.id}_${javascriptPackage.id}"
 
+    fun baseReleaseBuild(buildType: BuildType) : BuildType{
+
+        packPackage(
+        setPackageVersion("bower.json",
+        setPackageVersion("package.json",
+        buildType)))
+
+        return buildType
+    }
+
     val deployPreRelease =
         deployPreReleasePackage(
-        packPackage(
-        setPackageVersion(
+        baseReleaseBuild(
         BuildType({
 
         uuid               = "${baseUuid}_DeployPreRelease"
@@ -207,14 +219,13 @@ fun configureEs5PackageDeployProject(
                 }
             }
         }
-    }))))
+    })))
 
     val deployRelease =
         tagBuild("%PackageVersion%",
         commitPackageArtifactsToGit(javascriptPackage.unminifiedFile, javascriptPackage.minifiedFile,
         deployReleasePackage(
-        packPackage(
-        setPackageVersion(
+        baseReleaseBuild(
         BuildType({
 
         uuid         = "${baseUuid}_DeployRelease"
@@ -256,7 +267,7 @@ fun configureEs5PackageDeployProject(
                 }
             }
         }
-    }))))))
+    })))))
 
     return Project({
         uuid        = baseUuid

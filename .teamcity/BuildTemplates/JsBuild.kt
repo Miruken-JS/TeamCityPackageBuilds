@@ -10,7 +10,12 @@ import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.finishBuildTrigger
 fun configureJsProject(solution: JavascriptProject, packages: List<JavascriptPackage>) : Project{
 
     fun javascriptBuild(buildType: BuildType) : BuildType{
-        build(test(jspmInstall(yarnInstall(setPackageVersion(gitShortHash(buildType))))))
+        build(
+        test(
+        jspmInstall(
+        yarnInstall(
+        setPackageVersion("package.json",
+        gitShortHash(buildType))))))
 
         buildType.buildNumberPattern = "%BuildFormatSpecification%"
 
