@@ -32,16 +32,18 @@ object Project : Project({
                             Build.zip!/dist/miruken-bundle.js
                             Build.zip!/dist/miruken-bundle.min.js
                         """.trimIndent()
+                    ),
+                    Es5JavascriptPackage(
+                        uuid             = "63511f1c-3e19-45b9-8063-7e0ff1bca834",
+                        id               = "mirukenEs5Angular",
+                        packageName      = "miruken-es5-angular",
+                        packageGithubUrl = "git@github.com:Miruken-ES5/miruken-es5-angular.git",
+                        unminifiedFile   = "miruken-ng-bundle.js",
+                        minifiedFile     = "miruken-ng-bundle.min.js",
+                        artifactsOut = """
+                            Build.zip!/dist/miruken-ng-bundle.js
+                            Build.zip!/dist/miruken-ng-bundle.min.js
+                        """.trimIndent()
                     )
-//                    Es5JavascriptPackage(
-//                        id               = "mirukenEs5Angular",
-//                        packageName      = "miruken-es5-angular",
-//                        packageGithubUrl = "git@github.com:Miruken-ES5/miruken-es5-angular.git",
-//                        artifactsOut = """
-//                            Build.zip!/dist/miruken-ng-bundle.js     => miruken-ng-bundle.js
-//                            Build.zip!/dist/miruken-ng-bundle.min.js => miruken-ng-bundle.min.js
-//                        """.trimIndent()
-//                    )
             )))
-
 })
