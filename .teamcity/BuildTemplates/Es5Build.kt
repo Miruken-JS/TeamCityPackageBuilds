@@ -7,6 +7,7 @@ import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2017_2.*
 import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.finishBuildTrigger
 import jetbrains.buildServer.configs.kotlin.v2017_2.vcs.GitVcsRoot
+import jetbrains.buildServer.configs.kotlin.v2017_2.ui.*
 
 fun configureEs5Project(solution: JavascriptProject, packages: List<Es5JavascriptPackage>) : Project{
 
@@ -157,26 +158,7 @@ fun configureEs5PackageDeployProject(
     val baseUuid = "${javascriptProject.guid}_${javascriptPackage.id}"
     val baseId   = "${javascriptProject.id}_${javascriptPackage.id}"
 
-    fun packageVcsRoot(releaseType: String, buildType: BuildType) : BuildType{
-//        buildType.vcs{
-//            GitVcsRoot({
-//                uuid             = "${javascriptProject.guid}${releaseType}VcsRoot"
-//                id               = "${javascriptPackage.id}${releaseType}VcsRoot"
-//                name             = "${javascriptPackage.packageGithubUrl}${releaseType}VcsRoot"
-//
-//                url              = javascriptPackage.packageGithubUrl
-//                branch           = "%DefaultBranch%"
-//                branchSpec       = "%BranchSpecification%"
-//                agentCleanPolicy = GitVcsRoot.AgentCleanPolicy.ALWAYS
-//                authMethod = uploadedKey {
-//                    uploadedKey = "provenstyle"
-//                }
-//            })
-//        }
-        return buildType
-    }
-
-    val deployPreRelease =  packPackage(packageVcsRoot("preRelease", (setPackageVersion(BuildType({
+    val deployPreRelease =  packPackage(setPackageVersion(BuildType({
 
         uuid               = "${baseUuid}_DeployPreRelease"
         id                 = "${baseId}_DeployPreRelease"
@@ -210,9 +192,9 @@ fun configureEs5PackageDeployProject(
                 }
             }
         }
-    })))))
+    })))
 
-    val deployRelease = deployReleasePackage(packPackage(packageVcsRoot("release", BuildType({
+    val deployRelease = deployReleasePackage(packPackage(BuildType({
         uuid         = "${baseUuid}_DeployRelease"
         id           = "${baseId}_DeployRelease"
         name         = "Deploy Release"
@@ -224,6 +206,12 @@ fun configureEs5PackageDeployProject(
             param("BuildFormatSpecification", "%dep.${javascriptProject.releaseBuildId}.BuildFormatSpecification%")
             param("PackageVersion",           "%dep.${javascriptProject.releaseBuildId}.PackageVersion%")
             param("PrereleaseVersion",        "")
+        }
+
+        vcs{
+            add(javascriptPackage.packageVcsRootId)
+            cleanCheckout = true
+            checkoutMode  = CheckoutMode.ON_AGENT
         }
 
         triggers {
@@ -246,7 +234,7 @@ fun configureEs5PackageDeployProject(
                 }
             }
         }
-    }))))
+    })))
 
     return Project({
         uuid        = baseUuid
@@ -254,6 +242,20 @@ fun configureEs5PackageDeployProject(
         parentId    = javascriptProject.deploymentProjectId
         name        = javascriptPackage.packageName
         description = "${javascriptPackage.packageName} npm package"
+
+        vcsRoot{
+            GitVcsRoot({
+                uuid             = "${javascriptProject.guid}${javascriptPackage}_packageVcsRoot"
+                id               = javascriptPackage.packageVcsRootId
+                name             = "${javascriptPackage.packageName} VcsRoot"
+                url              = javascriptPackage.packageGithubUrl
+                branch           = "master"
+                agentCleanPolicy = GitVcsRoot.AgentCleanPolicy.ALWAYS
+                authMethod = uploadedKey {
+                    uploadedKey = "provenstyle"
+                }
+            })
+        }
 
         buildType(deployPreRelease)
         buildType(deployRelease)

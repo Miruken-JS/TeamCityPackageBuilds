@@ -40,6 +40,10 @@ class Es5JavascriptPackage (
         val id:               String,
         val packageName:      String,
         val packageGithubUrl: String,
-        val artifactsOut:     String)
+        val artifactsOut:     String){
+
+    val packageVcsRootId: String
+        get() = "${id}_PackageVCSRoot"
+}
 
 
