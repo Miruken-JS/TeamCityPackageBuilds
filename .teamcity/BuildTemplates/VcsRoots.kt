@@ -54,6 +54,7 @@ fun packageVcsRoot (javascriptPackage: Es5JavascriptPackage): GitVcsRoot {
         name             = "${javascriptPackage.packageGithubUrl}_Package"
         url              = javascriptPackage.packageGithubUrl
         branch           = "master"
+        branchSpec       = "+:refs/heads/(master)"
         agentCleanPolicy = GitVcsRoot.AgentCleanPolicy.ALWAYS
         authMethod = uploadedKey {
             uploadedKey = "provenstyle"
