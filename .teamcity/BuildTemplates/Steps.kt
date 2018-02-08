@@ -219,6 +219,7 @@ fun commitPackageArtifactsToGit(unminified: String, minified: String, buildType:
                             if(${'$'}branch -ne "master") { return 0 }
 
                             git add package.json
+                            git add bower.json
                             git add $minified
                             git add $unminified
                             git commit -m "Package artifacts from ci cd"
