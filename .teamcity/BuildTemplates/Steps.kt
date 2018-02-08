@@ -125,41 +125,46 @@ fun incrementProjectPatchVersion(buildType: BuildType) : BuildType{
             edition  = PowerShellStep.Edition.Desktop
             scriptMode = script {
                 content = """
-                        ${'$'}baseUri           = "localhost"
-                        ${'$'}projectId         = "%SolutionProjectId%"
-                        ${'$'}preReleaseBuildId = "%PreReleaseProjectId%"
-                        ${'$'}releaseBuildId    = "%ReleaseProjectId%"
-                        ${'$'}branch            = "%teamcity.build.branch%"
-                        ${'$'}username          = "%teamcityApiUserName%"
-                        ${'$'}password          = "%teamcityApiPassword%"
-                        ${'$'}base64AuthInfo    = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f ${'$'}username,${'$'}password)))
+                        try {
+                            ${'$'}baseUri           = "localhost"
+                            ${'$'}projectId         = "%SolutionProjectId%"
+                            ${'$'}preReleaseBuildId = "%PreReleaseProjectId%"
+                            ${'$'}releaseBuildId    = "%ReleaseProjectId%"
+                            ${'$'}branch            = "%teamcity.build.branch%"
+                            ${'$'}username          = "%teamcityApiUserName%"
+                            ${'$'}password          = "%teamcityApiPassword%"
+                            ${'$'}base64AuthInfo    = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f ${'$'}username,${'$'}password)))
 
-                        Write-Host "temp ${'$'}username ${'$'}password"
+                            Write-Host "temp ${'$'}username ${'$'}password"
 
-                        if(${'$'}branch -ne "master") {return 0};
+                            if(${'$'}branch -ne "master") {return 0};
 
-                        function Increment-ProjectPatchVersion (${'$'}projectId) {
-                            #get PatchVersion
-                            ${'$'}paramUri    ="${'$'}baseUri/httpAuth/app/rest/projects/id:${'$'}projectId/parameters/PatchVersion"
-                            Write-Host ${'$'}paramUri
-                            ${'$'}paramResult = Invoke-RestMethod -Headers @{Authorization=("Basic {0}" -f ${'$'}base64AuthInfo)} -Method Get -Uri ${'$'}paramUri
+                            function Increment-ProjectPatchVersion (${'$'}projectId) {
+                                #get PatchVersion
+                                ${'$'}paramUri    ="${'$'}baseUri/httpAuth/app/rest/projects/id:${'$'}projectId/parameters/PatchVersion"
+                                Write-Host ${'$'}paramUri
+                                ${'$'}paramResult = Invoke-RestMethod -Headers @{Authorization=("Basic {0}" -f ${'$'}base64AuthInfo)} -Method Get -Uri ${'$'}paramUri
 
-                            #increment PatchVersion
-                            ${'$'}newPatchVersion = ([int]${'$'}paramResult.property.value) + 1
-                            ${'$'}updateResult    = Invoke-RestMethod -Headers @{Authorization=("Basic {0}" -f ${'$'}base64AuthInfo);"Content-Type"="text/plain"} -Method Put -Uri ${'$'}paramUri -Body ${'$'}newPatchVersion
-                            Write-Host "Project ${'$'}projectId PatchVersion parameter incremented to ${'$'}newPatchVersion"
+                                #increment PatchVersion
+                                ${'$'}newPatchVersion = ([int]${'$'}paramResult.property.value) + 1
+                                ${'$'}updateResult    = Invoke-RestMethod -Headers @{Authorization=("Basic {0}" -f ${'$'}base64AuthInfo);"Content-Type"="text/plain"} -Method Put -Uri ${'$'}paramUri -Body ${'$'}newPatchVersion
+                                Write-Host "Project ${'$'}projectId PatchVersion parameter incremented to ${'$'}newPatchVersion"
+                            }
+
+                            function Reset-BuildCounter(${'$'}buildId) {
+                                ${'$'}buildCounterUri = "${'$'}baseUri/httpAuth/app/rest/buildTypes/id:${'$'}buildId/settings/buildNumberCounter"
+                                Write-Host ${'$'}buildCounterUri
+                                ${'$'}updateResult    = Invoke-RestMethod -Headers @{Authorization=("Basic {0}" -f ${'$'}base64AuthInfo);"Content-Type"="text/plain"} -Method Put -Uri ${'$'}buildCounterUri -Body 0
+                                Write-Host "Reset build counter for ${'$'}(${'$'}_.name)"
+                            }
+
+                            Increment-ProjectPatchVersion ${'$'}projectId
+                            Reset-BuildCounter            ${'$'}preReleaseBuildId
+                            Reset-BuildCounter            ${'$'}releaseBuildId
+                        } catch {
+                            return 1
                         }
-
-                        function Reset-BuildCounter(${'$'}buildId) {
-                            ${'$'}buildCounterUri = "${'$'}baseUri/httpAuth/app/rest/buildTypes/id:${'$'}buildId/settings/buildNumberCounter"
-                            Write-Host ${'$'}buildCounterUri
-                            ${'$'}updateResult    = Invoke-RestMethod -Headers @{Authorization=("Basic {0}" -f ${'$'}base64AuthInfo);"Content-Type"="text/plain"} -Method Put -Uri ${'$'}buildCounterUri -Body 0
-                            Write-Host "Reset build counter for ${'$'}(${'$'}_.name)"
-                        }
-
-                        Increment-ProjectPatchVersion ${'$'}projectId
-                        Reset-BuildCounter            ${'$'}preReleaseBuildId
-                        Reset-BuildCounter            ${'$'}releaseBuildId
+                        return 0
                     """.trimIndent()
             }
             noProfile = false
@@ -177,14 +182,20 @@ fun commitPackageArtifactsToGit(unminified: String, minified: String, buildType:
             edition    = PowerShellStep.Edition.Desktop
             scriptMode = script {
                 content = """
-                    ${'$'}branch = "%teamcity.build.branch%"
+                        try {
+                            ${'$'}branch = "%teamcity.build.branch%"
 
-                    if(${'$'}branch -ne "master") { return 0 }
+                            if(${'$'}branch -ne "master") { return 0 }
 
-                    git add package.json
-                    git add $minified
-                    git add $unminified
-                    git commit -m "Package artifacts from ci cd"
+                            git add package.json
+                            git add $minified
+                            git add $unminified
+                            git commit -m "Package artifacts from ci cd"
+                            git push origin master
+                        } catch {
+                            return 1
+                        }
+                        return 0
                 """.trimIndent()
             }
             noProfile = false
@@ -203,15 +214,20 @@ fun tagBuild(versionVariable: String, buildType: BuildType) : BuildType{
             edition    = PowerShellStep.Edition.Desktop
             scriptMode = script {
                 content = """
-                    ${'$'}branch = "%teamcity.build.branch%"
+                        try {
+                            ${'$'}branch = "%teamcity.build.branch%"
 
-                    if(${'$'}branch -ne "master") { return 0 }
+                            if(${'$'}branch -ne "master") { return 0 }
 
-                    ${'$'}tag = "$versionVariable"
-                    Write-Host "Taging build ${'$'}tag"
+                            ${'$'}tag = "$versionVariable"
+                            Write-Host "Taging build ${'$'}tag"
 
-                    git tag ${'$'}tag
-                    git push origin ${'$'}tag
+                            git tag ${'$'}tag
+                            git push origin ${'$'}tag
+                        } catch {
+                            return 1
+                        }
+                        return 0
                 """.trimIndent()
             }
             noProfile = false
