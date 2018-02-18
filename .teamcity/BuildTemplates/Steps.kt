@@ -1,5 +1,6 @@
 package BuildTemplates
 
+import jetbrains.buildServer.configs.kotlin.v2017_2.BuildStep
 import jetbrains.buildServer.configs.kotlin.v2017_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2017_2.TQ
 import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.PowerShellStep
@@ -11,6 +12,7 @@ fun yarnInstall(buildType: BuildType) : BuildType{
         script {
             name          = "Yarn Install"
             scriptContent = "%yarn% install"
+            executionMode = BuildStep.ExecutionMode.RUN_ON_SUCCESS
         }
     }
     return buildType
@@ -21,6 +23,7 @@ fun jspmInstall(buildType: BuildType) : BuildType{
         script {
             name          = "JSPM Install"
             scriptContent = "%jspm% install"
+            executionMode = BuildStep.ExecutionMode.RUN_ON_SUCCESS
         }
     }
     return buildType
@@ -31,6 +34,7 @@ fun test(buildType: BuildType) : BuildType{
         script {
             name          = "Test"
             scriptContent = "%gulp% test"
+            executionMode = BuildStep.ExecutionMode.RUN_ON_SUCCESS
         }
     }
     return buildType
@@ -41,6 +45,7 @@ fun build(buildType: BuildType) : BuildType{
         script {
             name          = "Build"
             scriptContent = "%gulp% build"
+            executionMode = BuildStep.ExecutionMode.RUN_ON_SUCCESS
         }
     }
     return buildType
@@ -51,6 +56,7 @@ fun gruntCI(buildType: BuildType) : BuildType{
         script {
             name          = "Grunt CI"
             scriptContent = "%grunt% ci"
+            executionMode = BuildStep.ExecutionMode.RUN_ON_SUCCESS
         }
     }
     return buildType
@@ -61,6 +67,7 @@ fun gitShortHash(buildType: BuildType) : BuildType{
         powerShell {
             name                = "Git Short Hash"
             formatStderrAsError = true
+            executionMode       = BuildStep.ExecutionMode.RUN_ON_SUCCESS
             scriptMode = script {
                 content = """
                         try {
@@ -74,9 +81,9 @@ fun gitShortHash(buildType: BuildType) : BuildType{
                             Write-Host "##teamcity[setParameter name='GitShortHash' value='${'$'}shortHash']"
                             Write-Host "##teamcity[buildNumber '${'$'}buildNumber']"
                         } catch {
-                            return 1
+                            Write-Error ${'$'}_
+                            Write-Host "##teamcity[buildStatus status='FAILURE' text='Failed to get shortHash']"
                         }
-                        return 0
                     """.trimIndent()
             }
         }
@@ -90,6 +97,7 @@ fun setMirukenVersion(buildType: BuildType) : BuildType{
         powerShell {
             name                = "Set Miruken Version"
             formatStderrAsError = true
+            executionMode       = BuildStep.ExecutionMode.RUN_ON_SUCCESS
             scriptMode = script {
                 content = """
                         try {
@@ -105,9 +113,9 @@ fun setMirukenVersion(buildType: BuildType) : BuildType{
 
                             Write-Host "Updated $fileName to version ${'$'}version"
                         } catch {
-                            return 1
+                            Write-Error ${'$'}_
+                            Write-Host "##teamcity[buildStatus status='FAILURE' text='Failed to set miruken version']"
                         }
-                        return 0
                     """.trimIndent()
             }
             param("jetbrains_powershell_scriptArguments", "%PackageVersion%")
@@ -121,6 +129,7 @@ fun setPackageVersion(fileName: String, buildType: BuildType) : BuildType{
         powerShell {
             name                = "Set Version In $fileName"
             formatStderrAsError = true
+            executionMode       = BuildStep.ExecutionMode.RUN_ON_SUCCESS
             scriptMode = script {
                 content = """
                         try {
@@ -136,9 +145,9 @@ fun setPackageVersion(fileName: String, buildType: BuildType) : BuildType{
 
                             Write-Host "Updated $fileName to version ${'$'}version"
                         } catch {
-                            return 1
+                            Write-Error ${'$'}_
+                            Write-Host "##teamcity[buildStatus status='FAILURE' text='Failed to set package version']"
                         }
-                        return 0
                     """.trimIndent()
             }
             param("jetbrains_powershell_scriptArguments", "%PackageVersion%")
@@ -150,10 +159,11 @@ fun setPackageVersion(fileName: String, buildType: BuildType) : BuildType{
 fun incrementProjectPatchVersion(buildType: BuildType) : BuildType{
     buildType.steps {
         powerShell {
-            name     = "Increment PatchVersion And Reset Build Counters"
-            id       = "${buildType.id}_VersionStep"
-            platform = PowerShellStep.Platform.x86
-            edition  = PowerShellStep.Edition.Desktop
+            name          = "Increment PatchVersion And Reset Build Counters"
+            id            = "${buildType.id}_VersionStep"
+            platform      = PowerShellStep.Platform.x86
+            edition       = PowerShellStep.Edition.Desktop
+            executionMode = BuildStep.ExecutionMode.RUN_ON_SUCCESS
             scriptMode = script {
                 content = """
                         try {
@@ -193,9 +203,9 @@ fun incrementProjectPatchVersion(buildType: BuildType) : BuildType{
                             Reset-BuildCounter            ${'$'}preReleaseBuildId
                             Reset-BuildCounter            ${'$'}releaseBuildId
                         } catch {
-                            return 1
+                            Write-Error ${'$'}_
+                            Write-Host "##teamcity[buildStatus status='FAILURE' text='Failed to reset version numbers and build counters']"
                         }
-                        return 0
                     """.trimIndent()
             }
             noProfile = false
@@ -207,10 +217,11 @@ fun incrementProjectPatchVersion(buildType: BuildType) : BuildType{
 fun commitPackageArtifactsToGit(unminified: String, minified: String, buildType: BuildType) : BuildType{
     buildType.steps {
         powerShell {
-            name       = "Commit Package Artifacts To Git"
-            id         = "${buildType.id}_CommitToGit"
-            platform   = PowerShellStep.Platform.x86
-            edition    = PowerShellStep.Edition.Desktop
+            name          = "Commit Package Artifacts To Git"
+            id            = "${buildType.id}_CommitToGit"
+            platform      = PowerShellStep.Platform.x86
+            edition       = PowerShellStep.Edition.Desktop
+            executionMode = BuildStep.ExecutionMode.RUN_ON_SUCCESS
             scriptMode = script {
                 content = """
                         try {
@@ -225,9 +236,9 @@ fun commitPackageArtifactsToGit(unminified: String, minified: String, buildType:
                             git commit -m "Package artifacts from ci cd"
                             git push origin master
                         } catch {
-                            return 1
+                            Write-Error ${'$'}_
+                            Write-Host "##teamcity[buildStatus status='FAILURE' text='Failed to commit to git']"
                         }
-                        return 0
                 """.trimIndent()
             }
             noProfile = false
@@ -240,10 +251,11 @@ fun commitPackageArtifactsToGit(unminified: String, minified: String, buildType:
 fun tagBuild(versionVariable: String, buildType: BuildType) : BuildType{
     buildType.steps {
         powerShell {
-            name       = "Tag Build From Master Branch"
-            id         = "${buildType.id}_TagStep"
-            platform   = PowerShellStep.Platform.x86
-            edition    = PowerShellStep.Edition.Desktop
+            name          = "Tag Build From Master Branch"
+            id            = "${buildType.id}_TagStep"
+            platform      = PowerShellStep.Platform.x86
+            edition       = PowerShellStep.Edition.Desktop
+            executionMode = BuildStep.ExecutionMode.RUN_ON_SUCCESS
             scriptMode = script {
                 content = """
                         try {
@@ -257,9 +269,9 @@ fun tagBuild(versionVariable: String, buildType: BuildType) : BuildType{
                             git tag ${'$'}tag
                             git push origin ${'$'}tag
                         } catch {
-                            return 1
+                            Write-Error ${'$'}_
+                            Write-Host "##teamcity[buildStatus status='FAILURE' text='Failed to tag build']"
                         }
-                        return 0
                 """.trimIndent()
             }
             noProfile = false
@@ -275,6 +287,7 @@ fun packPackage(buildType: BuildType) : BuildType{
         script {
             name          = "Pack"
             scriptContent = "%npm% pack"
+            executionMode = BuildStep.ExecutionMode.RUN_ON_SUCCESS
         }
     }
 
@@ -287,6 +300,7 @@ fun deployPreReleasePackage(buildType: BuildType) : BuildType{
         script {
             name          = "Publish PreRelease"
             scriptContent = "%npm% publish %PackageName%-%PackageVersion%.tgz --tag prerelease"
+            executionMode = BuildStep.ExecutionMode.RUN_ON_SUCCESS
         }
     }
 
@@ -299,6 +313,7 @@ fun deployReleasePackage(buildType: BuildType) : BuildType{
         script {
             name          = "Publish Release"
             scriptContent = "%npm% publish %PackageName%-%PackageVersion%.tgz --tag latest"
+            executionMode = BuildStep.ExecutionMode.RUN_ON_SUCCESS
         }
     }
 
