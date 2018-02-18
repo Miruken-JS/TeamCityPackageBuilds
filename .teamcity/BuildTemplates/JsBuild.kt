@@ -11,13 +11,15 @@ fun configureJsProject(solution: JavascriptProject, packages: List<JavascriptPac
 
     fun javascriptBuild(buildType: BuildType) : BuildType{
         build(
-        test(
-        jspmInstall(
-        yarnInstall(
-        setPackageVersion("package.json",
-        gitShortHash(buildType))))))
+            test(
+                jspmInstall(
+                    yarnInstall(
+                        setPackageVersion("package.json",
+                            gitShortHash(buildType))))))
 
-        buildType.buildNumberPattern = "%BuildFormatSpecification%"
+        buildType.buildNumberPattern  = "%BuildFormatSpecification%"
+        buildType.maxRunningBuilds    = 1
+        buildType.allowExternalStatus = true
 
         return buildType
     }
@@ -27,8 +29,6 @@ fun configureJsProject(solution: JavascriptProject, packages: List<JavascriptPac
         id          = solution.ciBuildId
         name        = "CI Build"
         description = "Watches git repo & creates a build for any change to any branch. Runs tests. Does NOT package/deploy packages!"
-
-        allowExternalStatus = true
 
         params {
             param("BranchSpecification", "+:refs/heads/(*)")
@@ -61,8 +61,6 @@ fun configureJsProject(solution: JavascriptProject, packages: List<JavascriptPac
         description   = "This will push a prerelease package"
         artifactRules = "%ArtifactsIn%"
 
-        allowExternalStatus = true
-
         params {
             param("BranchSpecification", """
             +:refs/heads/(develop)
@@ -89,8 +87,6 @@ fun configureJsProject(solution: JavascriptProject, packages: List<JavascriptPac
         description   = "This will push a release package from the MASTER branch."
         artifactRules = "%ArtifactsIn%"
 
-        allowExternalStatus = true
-
         params {
             param("BranchSpecification",              "+:refs/heads/(master)")
             param("DefaultBranch",                    "master")
@@ -100,7 +96,7 @@ fun configureJsProject(solution: JavascriptProject, packages: List<JavascriptPac
         vcs {
             root(releaseVcsRoot(solution))
             cleanCheckout = true
-            checkoutMode = CheckoutMode.ON_AGENT
+            checkoutMode  = CheckoutMode.ON_AGENT
         }
     }))))
 
@@ -167,11 +163,13 @@ fun configurePackageDeployProject(
     val baseId   = "${javascriptProject.id}_${javascriptPackage.id}"
 
     val deployPreRelease =  deployPreReleasePackage(packPackage(BuildType({
-        uuid               = "${baseUuid}_DeployPreRelease"
-        id                 = "${baseId}_DeployPreRelease"
-        name               = "Deploy PreRelease"
-        description        = "This will push a package with a -PreRelease tag"
-        buildNumberPattern = "%BuildFormatSpecification%"
+        uuid                = "${baseUuid}_DeployPreRelease"
+        id                  = "${baseId}_DeployPreRelease"
+        name                = "Deploy PreRelease"
+        description         = "This will push a package with a -PreRelease tag"
+        buildNumberPattern  = "%BuildFormatSpecification%"
+        maxRunningBuilds    = 1
+        allowExternalStatus = true
 
         params {
             param("BuildFormatSpecification", "%dep.${javascriptProject.preReleaseBuildId}.BuildFormatSpecification%")
@@ -207,7 +205,9 @@ fun configurePackageDeployProject(
         name         = "Deploy Release"
         description  = "This will push a release package from the MASTER branch. NO CI."
 
-        buildNumberPattern = "%BuildFormatSpecification%"
+        buildNumberPattern  = "%BuildFormatSpecification%"
+        maxRunningBuilds    = 1
+        allowExternalStatus = true
 
         params {
             param("BuildFormatSpecification", "%dep.${javascriptProject.releaseBuildId}.BuildFormatSpecification%")

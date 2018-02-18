@@ -16,6 +16,7 @@ fun configureEs5Project(solution: JavascriptProject, packages: List<Es5Javascrip
         gitShortHash(buildType))))
 
         buildType.buildNumberPattern = "%BuildFormatSpecification%"
+        buildType.maxRunningBuilds   = 1
 
         return buildType
     }
@@ -167,9 +168,12 @@ fun configureEs5PackageDeployProject(
     fun baseReleaseBuild(buildType: BuildType) : BuildType{
 
         packPackage(
-        setPackageVersion("bower.json",
-        setPackageVersion("package.json",
-        buildType)))
+            setPackageVersion("bower.json",
+                setPackageVersion("package.json",
+                    buildType)))
+
+        buildType.maxRunningBuilds   = 1
+        buildType.buildNumberPattern = "%BuildFormatSpecification%"
 
         return buildType
     }
@@ -183,7 +187,6 @@ fun configureEs5PackageDeployProject(
         id                 = "${baseId}_DeployPreRelease"
         name               = "Deploy PreRelease"
         description        = "This will push a package with a -PreRelease tag"
-        buildNumberPattern = "%BuildFormatSpecification%"
 
         params {
             param("BuildFormatSpecification", "%dep.${javascriptProject.preReleaseBuildId}.BuildFormatSpecification%")
@@ -230,8 +233,6 @@ fun configureEs5PackageDeployProject(
         id           = "${baseId}_DeployRelease"
         name         = "Deploy Release"
         description  = "This will push a release package from the MASTER branch. NO CI."
-
-        buildNumberPattern = "%BuildFormatSpecification%"
 
         params {
             param("BuildFormatSpecification", "%dep.${javascriptProject.releaseBuildId}.BuildFormatSpecification%")
