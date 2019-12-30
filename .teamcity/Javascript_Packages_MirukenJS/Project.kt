@@ -19,7 +19,7 @@ object Project : Project({
             codeGithubUrl     = "git@github.com:Miruken-JS/core.git",
             majorVersion      = "0",
             minorVersion      = "0",
-            patchVersion      = "4"),
+            patchVersion      = "5"),
             listOf(
                 JavascriptPackage(
                         id          = "mirukenCore",
@@ -34,10 +34,85 @@ object Project : Project({
             codeGithubUrl     = "git@github.com:Miruken-JS/callback.git",
             majorVersion      = "0",
             minorVersion      = "0",
-            patchVersion      = "4"),
+            patchVersion      = "5"),
+            listOf(
+                    JavascriptPackage(
+                            id          = "mirukenCallback",
+                            packageName = "miruken-callback"
+                    ))))
+
+    subProject(configureJsProject(JavascriptProject(
+            guid              = "1FAAD777-65EB-4FBD-8D19-3D31C4C2F313",
+            parentId          = "Javascript_Packages_MirukenJS",
+            id                = "Javascript_Packages_MirukenJs_Context",
+            name              = "Context Project",
+            codeGithubUrl     = "git@github.com:Miruken-JS/context.git",
+            majorVersion      = "0",
+            minorVersion      = "0",
+            patchVersion      = "5"),
+            listOf(
+                    JavascriptPackage(
+                            id          = "mirukenContext",
+                            packageName = "miruken-context"
+                    ))))
+
+    subProject(configureJsProject(JavascriptProject(
+            guid              = "5C3AC82A-9C35-4C22-AE73-ADE208141348",
+            parentId          = "Javascript_Packages_MirukenJS",
+            id                = "Javascript_Packages_MirukenJs_Map",
+            name              = "Map Project",
+            codeGithubUrl     = "git@github.com:Miruken-JS/map.git",
+            majorVersion      = "0",
+            minorVersion      = "0",
+            patchVersion      = "5"),
             listOf(
                 JavascriptPackage(
-                        id          = "mirukenCallback",
-                        packageName = "miruken-callback"
+                        id          = "mirukenMap",
+                        packageName = "miruken-map"
                 ))))
+
+    subProject(configureJsProject(JavascriptProject(
+            guid              = "D611F92E-2EEC-4F80-9B0D-0B34F6D0FEB0",
+            parentId          = "Javascript_Packages_MirukenJS",
+            id                = "Javascript_Packages_MirukenJs_Error",
+            name              = "Error Project",
+            codeGithubUrl     = "git@github.com:Miruken-JS/error.git",
+            majorVersion      = "0",
+            minorVersion      = "0",
+            patchVersion      = "5"),
+            listOf(
+                    JavascriptPackage(
+                            id          = "mirukenError",
+                            packageName = "miruken-error"
+                    ))))
+
+    subProject(configureJsProject(JavascriptProject(
+            guid              = "12DB5C1F-FB26-40ED-8F42-662DB4EE8124",
+            parentId          = "Javascript_Packages_MirukenJS",
+            id                = "Javascript_Packages_MirukenJs_Validate",
+            name              = "Validate Project",
+            codeGithubUrl     = "git@github.com:Miruken-JS/validate.git",
+            majorVersion      = "0",
+            minorVersion      = "0",
+            patchVersion      = "5"),
+            listOf(
+                    JavascriptPackage(
+                            id          = "mirukenValidate",
+                            packageName = "miruken-validate"
+                    ))))
+
+    subProject(configureJsProject(JavascriptProject(
+            guid              = "E132AC35-5F9F-4933-B579-E713B4C8F33F",
+            parentId          = "Javascript_Packages_MirukenJS",
+            id                = "Javascript_Packages_MirukenJs_IOC",
+            name              = "IOC Project",
+            codeGithubUrl     = "git@github.com:Miruken-JS/ioc.git",
+            majorVersion      = "0",
+            minorVersion      = "0",
+            patchVersion      = "5"),
+            listOf(
+                    JavascriptPackage(
+                            id          = "mirukenIOC",
+                            packageName = "miruken-ioc"
+                    ))))
 })
