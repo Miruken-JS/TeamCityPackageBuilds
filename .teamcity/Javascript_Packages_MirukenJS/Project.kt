@@ -115,4 +115,19 @@ object Project : Project({
                             id          = "mirukenIOC",
                             packageName = "miruken-ioc"
                     ))))
+
+    subProject(configureJsProject(JavascriptProject(
+            guid              = "DCF5584D-CBD2-46F0-A92F-BBE5076BBDBC",
+            parentId          = "Javascript_Packages_MirukenMVC",
+            id                = "Javascript_Packages_MirukenJs_MVC",
+            name              = "MVC Project",
+            codeGithubUrl     = "git@github.com:Miruken-JS/mvc.git",
+            majorVersion      = "0",
+            minorVersion      = "0",
+            patchVersion      = "5"),
+            listOf(
+                    JavascriptPackage(
+                            id          = "mirukenMVC",
+                            packageName = "miruken-mvc"
+                    ))))
 })
