@@ -299,7 +299,7 @@ fun deployPreReleasePackage(buildType: BuildType) : BuildType{
     buildType.steps {
         script {
             name          = "Publish PreRelease"
-            scriptContent = "%npm% publish %PackageName%-%PackageVersion%.tgz --tag prerelease"
+            scriptContent = "%npm% publish %PackageName%-%PackageVersion%.tgz --tag prerelease --access public"
             executionMode = BuildStep.ExecutionMode.RUN_ON_SUCCESS
         }
     }
@@ -312,7 +312,7 @@ fun deployReleasePackage(buildType: BuildType) : BuildType{
     buildType.steps {
         script {
             name          = "Publish Release"
-            scriptContent = "%npm% publish %PackageName%-%PackageVersion%.tgz --tag latest"
+            scriptContent = "%npm% publish %PackageName%-%PackageVersion%.tgz --tag latest --access public"
             executionMode = BuildStep.ExecutionMode.RUN_ON_SUCCESS
         }
     }
