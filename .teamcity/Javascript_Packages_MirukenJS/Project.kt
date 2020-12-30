@@ -120,7 +120,7 @@ object Project : Project({
             guid              = "DCF5584D-CBD2-46F0-A92F-BBE5076BBDBC",
             parentId          = "Javascript_Packages_MirukenMVC",
             id                = "Javascript_Packages_MirukenJs_MVC",
-            name              = "MVC Project",
+            name              = "Mvc Project",
             codeGithubUrl     = "git@github.com:Miruken-JS/mvc.git",
             majorVersion      = "0",
             minorVersion      = "0",
