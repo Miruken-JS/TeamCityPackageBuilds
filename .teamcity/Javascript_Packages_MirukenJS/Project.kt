@@ -55,4 +55,19 @@ object Project : Project({
                             id          = "mirukenMVC",
                             packageName = "miruken-mvc"
                     ))))
+
+    subProject(configureJsProject(JavascriptProject(
+            guid              = "727fe51d-4d5e-4b63-a1bf-60ad03f5986a",
+            parentId          = "Javascript_Packages_MirukenJS",
+            id                = "Javascript_Packages_MirukenJs_Http",
+            name              = "Http Project",
+            codeGithubUrl     = "git@github.com:Miruken-JS/http.git",
+            majorVersion      = "0",
+            minorVersion      = "0",
+            patchVersion      = "1"),
+            listOf(
+                    JavascriptPackage(
+                            id          = "mirukenHttp",
+                            packageName = "miruken-http"
+                    ))))
 })
