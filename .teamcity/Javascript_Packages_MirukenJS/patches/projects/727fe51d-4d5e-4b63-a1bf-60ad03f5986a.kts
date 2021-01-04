@@ -17,5 +17,11 @@ changeProject("727fe51d-4d5e-4b63-a1bf-60ad03f5986a") {
         update {
             param("MajorVersion", "2")
         }
+        expect {
+            param("PatchVersion", "1")
+        }
+        update {
+            param("PatchVersion", "0")
+        }
     }
 }
